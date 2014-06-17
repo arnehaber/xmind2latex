@@ -21,7 +21,7 @@
 
   <groupId>de.haber</groupId>
   <artifactId>xmind2latex</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>XMind to Latex</name>
   <packaging>jar</packaging>
 
@@ -32,7 +32,19 @@
       <distribution>manual</distribution>
     </license>
   </licenses>
-
+  
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/arnehaber/xmind2latex/issues</url>
+  </issueManagement>
+  
+  <scm>
+    <url>https://github.com/arnehaber/xmind2latex</url>
+    <developerConnection>https://github.com/arnehaber/xmind2latex</developerConnection>
+    <connection>https://github.com/arnehaber/xmind2latex</connection>
+    <tag>master</tag>
+  </scm>
+  
   <properties>
     <java.version>1.7</java.version>
     <assemble.dir>${project.build.directory}/app</assemble.dir>
