@@ -73,6 +73,11 @@ In templates, the following variables are available:
 * _level_         - hierarchical level of the currently processed text
 * _innerLevel_    - hierarchical level of used default templates
 
+## Version History
+### 1.0.0 
+* initial release
+
+
 ## License
 
     Copyright 2014 Arne Haber
