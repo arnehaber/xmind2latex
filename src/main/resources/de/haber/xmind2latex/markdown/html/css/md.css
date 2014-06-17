@@ -15,7 +15,6 @@ input,button,textarea {
 }
 
 iframe {
-    height: 100%;
     width: 98%;
     font-size: 80%;
     line-height: 1.2em;

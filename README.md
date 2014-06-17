@@ -6,13 +6,18 @@ This way, chapters of a book may be structured as a mind map that is then export
 * _bin_ - start scripts
     * _xmind2latex.bat_ - windows start script
     * _xmind2latex.sh_  - unix/linux start script
-* _doc_ - style files for the documentation
-* _license_ - contains the license and further dependencies information
+* _doc_
+    * _commands.txt_ - printed help message included in the documentation
+    * _md*.*_ - style css files used in the documentation
+* _license_ - contains licenses and further dependencies information
 * _repo_ - contains dependencies, add custom templates here
     * _*.jar_ project dependencies
 * _README.html_ - this readme file
 
 ## Command Line Parameters
+
+<iframe src="doc/commands.txt" scrolling="no" height="440">
+
     usage: xmind2latex
      -e,--env <level> <start> <end>           Sets the start and end environment templates for the given
                                               level (optional). Templates must be either loadable from
@@ -31,6 +36,8 @@ This way, chapters of a book may be structured as a mind map that is then export
                                               separator).
      -o,--output <output file>                Output file name (optional). Default output file is
                                               "<input file>.tex."
+
+</iframe>
 
 
 ## Default Configuration
@@ -100,7 +107,7 @@ All test input files are downloaded from [http://www.xmind.net/share/](http://ww
 
 ## Dependencies
 
-<iframe src="license/dependencies.txt" scrolling="no">
+<iframe src="license/dependencies.txt" scrolling="no" height="130">
 
 A list of dependencies is given [here](./license/dependencies.txt "Dependencies").
 

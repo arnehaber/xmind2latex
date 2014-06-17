@@ -40,9 +40,15 @@ import org.junit.Test;
  */
 public class XMindToLatexExporterTest {
     
+    /**
+     * Tests the showHelp() method. Additionally exports the help message into file
+     * target/app/doc/commands.txt that is used in the documentation.
+     * 
+     * @throws IOException
+     */
     @Test
     public void testShowHelp() throws IOException {
-        File result = new File("target/commands.md");
+        File result = new File("target/app/doc/commands.txt");
         result.delete();
         result.getParentFile().mkdirs();
         result.createNewFile();
