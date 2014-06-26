@@ -19,12 +19,16 @@ package de.haber.xmind2latex;
 import static de.haber.xmind2latex.XMindToLatexExporter.TEMPLATE_FOLDER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+
+import net.lingala.zip4j.io.ZipInputStream;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
@@ -112,7 +116,6 @@ public class XMindToLatexExporterConfigurationTest {
             exporter.configure(args);
             
             assertEquals(expectedOut, exporter.getTargetFile().getAbsolutePath());
-            assertEquals(in.getAbsolutePath(), exporter.getxMindSource().getAbsolutePath());
             assertTrue(exporter.isOverwriteExistingFile());
         }
         catch (ParseException e) {
@@ -137,7 +140,6 @@ public class XMindToLatexExporterConfigurationTest {
             exporter.configure(args);
             
             assertEquals(expectedOut, exporter.getTargetFile().getAbsolutePath());
-            assertEquals(in.getAbsolutePath(), exporter.getxMindSource().getAbsolutePath());
             assertTrue(exporter.isOverwriteExistingFile());
         }
         catch (ParseException e) {
@@ -239,7 +241,6 @@ public class XMindToLatexExporterConfigurationTest {
             exporter.configure(args);
             
             assertEquals(out.getAbsolutePath(), exporter.getTargetFile().getAbsolutePath());
-            assertEquals(in.getAbsolutePath(), exporter.getxMindSource().getAbsolutePath());
             assertFalse(exporter.isOverwriteExistingFile());
         }
         catch (ParseException e) {
@@ -262,7 +263,6 @@ public class XMindToLatexExporterConfigurationTest {
             exporter.configure(args);
             
             assertEquals(out.getAbsolutePath(), exporter.getTargetFile().getAbsolutePath());
-            assertEquals(in.getAbsolutePath(), exporter.getxMindSource().getAbsolutePath());
             assertFalse(exporter.isOverwriteExistingFile());
         }
         catch (ParseException e) {
@@ -271,7 +271,7 @@ public class XMindToLatexExporterConfigurationTest {
     }
     
     @Test
-    public void testDefaultConfigure() {
+    public void testConfigureIn() {
         File in = new File("src/test/resources/content.xml");
         
         String expectedOut = in.getAbsolutePath().concat(".tex");
@@ -284,10 +284,12 @@ public class XMindToLatexExporterConfigurationTest {
             exporter = new XMindToLatexExporter();
             exporter.configure(args);
             assertEquals(expectedOut, exporter.getTargetFile().getAbsolutePath());
-            assertEquals(in.getAbsolutePath(), exporter.getxMindSource().getAbsolutePath());
+            assertTrue(exporter.getxMindSourceAsStream() instanceof FileInputStream);
+            FileInputStream fis = (FileInputStream) exporter.getxMindSourceAsStream();
+            assertTrue(fis.getFD().valid());
             assertFalse(exporter.isOverwriteExistingFile());
         }
-        catch (ParseException e) {
+        catch (Exception e) {
             fail(e.getMessage());
         }
     }
@@ -329,7 +331,7 @@ public class XMindToLatexExporterConfigurationTest {
     }
     
     @Test
-    public void testDefaultConfigure2() {
+    public void testConfigureIn2() {
         File in = new File("src/test/resources/content.xml");
         
         String expectedOut = in.getAbsolutePath().concat(".tex");
@@ -341,36 +343,34 @@ public class XMindToLatexExporterConfigurationTest {
             exporter = new XMindToLatexExporter();
             exporter.configure(args);
             assertEquals(expectedOut, exporter.getTargetFile().getAbsolutePath());
-            assertEquals(in.getAbsolutePath(), exporter.getxMindSource().getAbsolutePath());
+            FileInputStream fis = (FileInputStream) exporter.getxMindSourceAsStream();
+            assertTrue(fis.getFD().valid());
             assertFalse(exporter.isOverwriteExistingFile());
         }
-        catch (ParseException e) {
+        catch (Exception e) {
             fail(e.getMessage());
         }
     }
     
     @Test
-    public void testDefaultConfigureXMindSource() {
+    public void testConfigureInXMindSource() {
         File in = new File("src/test/resources/example.xmind");
-        File tmp = new File("target/testout/tmp");
         
         String expectedOut = in.getAbsolutePath().concat(".tex");
-        File expectedTmpFile = new File(tmp, "content.xml");
         
         String[] args = new String[] {
                 "-i", in.getPath()
         };
         XMindToLatexExporter exporter = new XMindToLatexExporter();
-        XMindToLatexExporter.TMP_DIRECTORY = tmp.getAbsolutePath();
         try {
             exporter.configure(args);
             assertEquals(expectedOut, exporter.getTargetFile().getAbsolutePath());
-            assertEquals(expectedTmpFile.getAbsolutePath(), exporter.getxMindSource().getAbsolutePath());
+            assertTrue(exporter.getxMindSourceAsStream().getClass().getName(), exporter.getxMindSourceAsStream() instanceof ZipInputStream);
+            ZipInputStream fis = (ZipInputStream) exporter.getxMindSourceAsStream();
+            assertNotNull(fis);
             assertFalse(exporter.isOverwriteExistingFile());
-            assertTrue(tmp.exists());
-            assertTrue(expectedTmpFile.exists());
         }
-        catch (ParseException e) {
+        catch (Exception e) {
             for (Throwable t : e.getSuppressed()) {
                 t.printStackTrace();
             }

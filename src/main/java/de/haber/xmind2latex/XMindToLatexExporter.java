@@ -16,11 +16,17 @@
  */
 package de.haber.xmind2latex;
 
-import static de.haber.xmind2latex.Parameters.*;
+import static de.haber.xmind2latex.Parameters.ENVIRONMENT;
+import static de.haber.xmind2latex.Parameters.FORCE;
+import static de.haber.xmind2latex.Parameters.HELP;
+import static de.haber.xmind2latex.Parameters.INPUT;
+import static de.haber.xmind2latex.Parameters.LEVEL;
+import static de.haber.xmind2latex.Parameters.OUTPUT;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.FileAlreadyExistsException;
@@ -34,6 +40,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.FileHeader;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -76,11 +83,6 @@ public class XMindToLatexExporter {
     public static final String TITLE = "title";
     public static final String TOPIC = "topic";
     
-    /**
-     * Temp directory used to extract zipped XMind files to.   
-     */
-    protected static String TMP_DIRECTORY = "tmp" + System.currentTimeMillis();
-    
     private int depthCounter = 0;
     private Map<Integer, String> level2endTemplate = Maps.newHashMap();
     
@@ -101,11 +103,6 @@ public class XMindToLatexExporter {
             TEMPLATE_FOLDER + "subsection",
             TEMPLATE_FOLDER + "subsubsection"
     );
-    
-    /**
-     * XMind source file (XML).
-     */
-    private File xMindSource;
     
     private final Configuration templateConfig;
 
@@ -129,18 +126,13 @@ public class XMindToLatexExporter {
         CommandLine cmd = parser.parse(options, args);
         File in = new File(cmd.getOptionValue(INPUT));
         try {
-            setxMindSource(in);
+            setxMindSourceInputStream(in);
         }
-        catch (ZipException e) {
+        catch (Exception e) {
             ParseException e1 = new ParseException(e.getMessage());
             e1.addSuppressed(e);
             throw e1;
         }
-        catch (FileNotFoundException e) {
-            ParseException e1 = new ParseException(e.getMessage());
-            e1.addSuppressed(e);
-            throw e1;
-        }    
         if (cmd.hasOption(FORCE)) {
             this.setOverwriteExistingFile(true);
         }
@@ -196,24 +188,20 @@ public class XMindToLatexExporter {
     }
     
     public void convert() throws ParserConfigurationException, SAXException, IOException {
-        if (getxMindSource() == null) {
+        InputStream is = getxMindSourceAsStream();
+        if (is == null) {
             throw new ParserConfigurationException("Call configure() before convert()."); 
         }
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(getxMindSource());
+        Document document = builder.parse(is);
+        is.close();
         StringBuilder sb = new StringBuilder();
         
         sb.append(convert(document.getChildNodes()));
         
         String text = sb.toString();
         save(text);
-        
-        // clean up tmp files
-        File tmp = new File(TMP_DIRECTORY); 
-        if (tmp.exists()) {
-            FileUtils.deleteDirectory(tmp);
-        }
     }
     
     /**
@@ -350,11 +338,8 @@ public class XMindToLatexExporter {
         return processTemplate(template, level, text);
     }
     
-    /**
-     * @return the xMindSource
-     */
-    public File getxMindSource() {
-        return xMindSource;
+    public InputStream getxMindSourceAsStream() {
+        return this.xMindSourceStream;
     }
     
     /**
@@ -448,29 +433,25 @@ public class XMindToLatexExporter {
      * @param xMindSource the xMindSource to set, must not be null
      * 
      * @throws ZipException if a given XMind file may not be extracted.
-     * @throws FileNotFoundException if the given input file does not exist.
+     * @throws IOException 
      */
-    public void setxMindSource(File xMindSource) throws ZipException, FileNotFoundException {
+    public void setxMindSourceInputStream(File xMindSource) throws ZipException, IOException {
         Preconditions.checkNotNull(xMindSource);
         File usedFile = xMindSource;
         if (!usedFile.exists()) {
             throw new FileNotFoundException("The given input file " + xMindSource+ " does not exist!");
         }
         if (usedFile.getName().endsWith(".xmind")) {
-            File tmp = new File(TMP_DIRECTORY);
-            if (!tmp.exists()) {
-                if (tmp.getParentFile() != null) {
-                    tmp.getParentFile().mkdirs();
-                }
-                tmp.mkdir();
-            }
             ZipFile zip = new ZipFile(usedFile);
-            zip.extractAll(tmp.getAbsolutePath());
-            usedFile = new File(tmp, "content.xml");
-            
+            FileHeader fh = zip.getFileHeader("content.xml");
+            xMindSourceStream = zip.getInputStream(fh);
         }
-        this.xMindSource = usedFile;
+        else {
+            xMindSourceStream = FileUtils.openInputStream(usedFile);
+        }
     }
+    
+    private InputStream xMindSourceStream;
     
     /**
      * 

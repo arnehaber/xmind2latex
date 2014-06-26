@@ -212,7 +212,6 @@ public class XMindToLatexExporterExecutionTest {
     @Test
     public void testExecuteXMindFile() {
         File in = new File("src/test/resources/example.xmind");
-        File tmp = new File("target/testout/tmp_testExecuteXMindFile");
         File out = new File("target/testout/result_testExecuteXMindFile.tex");
         if (out.exists()) {
             out.delete();
@@ -222,16 +221,12 @@ public class XMindToLatexExporterExecutionTest {
                 "-o", out.getAbsolutePath()
         };
         XMindToLatexExporter exporter = new XMindToLatexExporter();
-        XMindToLatexExporter.TMP_DIRECTORY = tmp.getAbsolutePath();
         try {
-            assertFalse(tmp.exists());
             exporter = new XMindToLatexExporter();
             exporter.configure(args);
-            assertTrue(tmp.exists());
             assertFalse(out.exists());
             exporter.convert();
             assertTrue(out.exists());
-            assertFalse(tmp.exists());
         }
         catch (Exception e) {
             fail(e.getMessage());
