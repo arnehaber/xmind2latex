@@ -79,6 +79,7 @@ In templates, the following variables are available:
 * _text_          - input text from processed XMind file 
 * _level_         - hierarchical level of the currently processed text
 * _innerLevel_    - hierarchical level of used default templates
+* _indent_        - indentions (spaces) corresponding to the current inner level
 
 ## Version History
 ### 1.0.0 

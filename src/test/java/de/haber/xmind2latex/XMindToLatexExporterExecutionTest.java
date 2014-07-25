@@ -313,6 +313,61 @@ public class XMindToLatexExporterExecutionTest {
     }
     
     @Test
+    public void testIndentionWithMaxLevel() {
+        File in = new File("src/test/resources/jms.xmind");
+        File out = new File("target/testout/result_testIndentionWithMaxLevel.tex");
+        String[] args = new String[] {
+                "-" + INPUT, in.getAbsolutePath(),
+                "-" + OUTPUT, out.getAbsolutePath(),
+                "-" + FORCE,
+                "-" + TEMPLATE_LEVEL, "2"
+        };
+        XMindToLatexExporter exporter;
+        try {
+            exporter = new XMindToLatexExporter();
+            exporter.configure(args);
+            exporter.convert();
+            assertTrue(out.exists());
+            String content = FileUtils.readFileToString(out);
+            assertTrue(content.contains("% 0 - LEAD"));
+            assertTrue(content.contains("  % 1 - Auto response,"));
+            assertTrue(content.contains("    % 2 - Case Number (CN) UNIQUE"));
+        }
+        catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testIndention() {
+        File in = new File("src/test/resources/jms.xmind");
+        File out = new File("target/testout/result_testIndention.tex");
+        String[] args = new String[] {
+                "-" + INPUT, in.getAbsolutePath(),
+                "-" + OUTPUT, out.getAbsolutePath(),
+                "-" + FORCE
+        };
+        XMindToLatexExporter exporter;
+        try {
+            exporter = new XMindToLatexExporter();
+            exporter.configure(args);
+            exporter.convert();
+            assertTrue(out.exists());
+            String content = FileUtils.readFileToString(out);
+            assertTrue(content.contains("\\chapter"));
+            assertTrue(content.contains("\\section"));
+            assertTrue(content.contains("\\subsection"));
+            assertTrue(content.contains("\\subsubsection"));
+            assertFalse(content.contains("\\paragraph"));
+            assertTrue(content.contains("% 0 - Case Number (CN) UNIQUE"));
+            assertTrue(content.contains("  % 1 - Onsite copy"));
+        }
+        catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
     public void testExecuteWithMaxLevel2() {
         File in = new File("src/test/resources/jms.xmind");
         File out = new File("target/testout/result_testExecuteWithMaxLevel.tex");

@@ -82,6 +82,9 @@ public class XMindToLatexExporter {
     public static final String TITLE = "title";
     public static final String TOPIC = "topic";
     
+    /** Used as indention. */
+    public static final String INDENT = "  ";
+    
     private int depthCounter = 0;
     private Map<Integer, String> level2endTemplate = Maps.newHashMap();
     
@@ -339,16 +342,21 @@ public class XMindToLatexExporter {
     
     private String processTemplate(String template, int level, String text) {
         Map<String, String> data = new HashMap<String, String>();
-        
-        int inner = level - templates.size() + 1;
+        int maxLevel = getMaxLevel() != -1 ? getMaxLevel() + 1 : templates.size();
+        int inner = level - maxLevel;
         data.put("text", text);
         data.put("level", "" + level);
         data.put("innerLevel", "" + inner);
+        StringBuilder currentIndent = new StringBuilder();
+        for ( int i = 0; i < inner; i++) {
+            currentIndent.append(INDENT);
+        }
+        data.put("indent", currentIndent.toString());
+        
 
         StringWriter writer = new StringWriter();
         try {
-            String concreteTempl = template;
-            Template t = templateConfig.getTemplate(concreteTempl);
+            Template t = templateConfig.getTemplate(template);
             t.process(data, writer);
         }
         catch (Exception e) {
