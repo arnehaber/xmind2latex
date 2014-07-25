@@ -36,6 +36,7 @@ This way, chapters of a book may be structured as a mind map that is then export
                                               separator).
      -o,--output <output file>                Output file name (optional). Default output file is
                                               "<input file>.tex."
+     -t,--template-level <template level>     Maximal level for template usage.                                              
 
 </iframe>
 
@@ -82,6 +83,12 @@ In templates, the following variables are available:
 * _indent_        - indentions (spaces) corresponding to the current inner level
 
 ## Version History
+### 1.1.0
+* Read xml as well as XMind source files using an input stream to omit extraction of XMind files (issue #2).
+* Removed '.sh' from linux execution script (issue #3).
+* Added parameter 't' to control until which level templates are used (issue #4).
+* Undefined entries are now indented according to their level (issue #5).
+
 ### 1.0.0 
 * initial release
 
