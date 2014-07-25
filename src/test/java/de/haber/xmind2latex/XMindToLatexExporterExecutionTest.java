@@ -17,6 +17,7 @@
 package de.haber.xmind2latex;
 
 import static de.haber.xmind2latex.XMindToLatexExporter.TEMPLATE_FOLDER;
+import static de.haber.xmind2latex.Parameters.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -240,9 +241,9 @@ public class XMindToLatexExporterExecutionTest {
         out.delete();
         String expectedTemplate = "src/test/resources/someExternalTemplate.ftl"; 
         String[] args = new String[] {
-                "-i", in.getPath(),
-                "-l", "2", expectedTemplate,
-                "-o", out.getAbsolutePath()
+                "-" + INPUT, in.getPath(),
+                "-" + LEVEL, "2", expectedTemplate,
+                "-" + OUTPUT, out.getAbsolutePath()
         };
         XMindToLatexExporter exporter;
         try {
@@ -280,6 +281,62 @@ public class XMindToLatexExporterExecutionTest {
         catch (Exception e) {
             assertTrue(e instanceof TemplateNotExistsException);
             assertEquals(expectedTemplate, ((TemplateNotExistsException) e).getTemplate());
+        }
+    }
+    
+    @Test
+    public void testExecuteWithMaxLevel1() {
+        File in = new File("src/test/resources/jms.xmind");
+        File out = new File("target/testout/result_testExecuteWithMaxLevel.tex");
+        String[] args = new String[] {
+                "-" + INPUT, in.getAbsolutePath(),
+                "-" + OUTPUT, out.getAbsolutePath(),
+                "-" + FORCE,
+                "-" + TEMPLATE_LEVEL, "2"
+        };
+        XMindToLatexExporter exporter;
+        try {
+            exporter = new XMindToLatexExporter();
+            exporter.configure(args);
+            exporter.convert();
+            assertTrue(out.exists());
+            String content = FileUtils.readFileToString(out);
+            assertTrue(content.contains("\\chapter"));
+            assertTrue(content.contains("\\section"));
+            assertFalse(content.contains("\\subsection"));
+            assertFalse(content.contains("\\subsubsection"));
+            assertFalse(content.contains("\\paragraph"));
+        }
+        catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testExecuteWithMaxLevel2() {
+        File in = new File("src/test/resources/jms.xmind");
+        File out = new File("target/testout/result_testExecuteWithMaxLevel.tex");
+        String[] args = new String[] {
+                "-" + INPUT, in.getAbsolutePath(),
+                "-" + OUTPUT, out.getAbsolutePath(),
+                "-" + FORCE,
+                "-" + TEMPLATE_LEVEL, "4"
+        };
+        XMindToLatexExporter exporter;
+        try {
+            exporter = new XMindToLatexExporter();
+            exporter.configure(args);
+            exporter.convert();
+            assertTrue(out.exists());
+            String content = FileUtils.readFileToString(out);
+            assertTrue(content.contains("\\chapter"));
+            assertTrue(content.contains("\\section"));
+            assertTrue(content.contains("\\subsection"));
+            assertTrue(content.contains("\\subsubsection"));
+            assertFalse(content.contains("\\paragraph"));
+        }
+        catch (Exception e) {
+            fail(e.getMessage());
         }
     }
     

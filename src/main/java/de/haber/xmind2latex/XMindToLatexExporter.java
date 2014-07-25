@@ -22,6 +22,7 @@ import static de.haber.xmind2latex.Parameters.HELP;
 import static de.haber.xmind2latex.Parameters.INPUT;
 import static de.haber.xmind2latex.Parameters.LEVEL;
 import static de.haber.xmind2latex.Parameters.OUTPUT;
+import static de.haber.xmind2latex.Parameters.TEMPLATE_LEVEL;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,10 +47,8 @@ import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PatternOptionBuilder;
 import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -92,6 +91,12 @@ public class XMindToLatexExporter {
     private boolean overwriteExistingFile = false;
     
     /**
+     * The maximal level used for template processing. -1 corresponds to
+     * 'process all available templates'.
+     */
+    private int maxLevel = -1;
+    
+    /**
      * Target file.
      */
     private File targetFile;
@@ -110,7 +115,7 @@ public class XMindToLatexExporter {
      * Creates a new {@link XMindToLatexExporter}.
      */
     public XMindToLatexExporter() {
-        options = getOptions();
+        options = CliOptionBuilder.getOptions();
         templateConfig = new Configuration();
         templateConfig.setClassForTemplateLoading(getClass(), "");
         templateConfig.setTemplateLoader(new XMindTemplateLoader(getClass().getClassLoader()));
@@ -147,7 +152,22 @@ public class XMindToLatexExporter {
         }
         this.setTargetFile(out);
 
-        
+        if (cmd.hasOption(TEMPLATE_LEVEL)) {
+            String level = cmd.getOptionValue(TEMPLATE_LEVEL);
+            try {
+                int levelAsInt = Integer.parseInt(level);
+                if (levelAsInt < 0) {
+                    throw new NumberFormatException();
+                }
+                setMaxLevel(levelAsInt);
+            }
+            catch (NumberFormatException e) {
+                ParseException ex = new ParseException("The level argument of option " + TEMPLATE_LEVEL + " has to be a positive integer.");
+                ex.addSuppressed(e);
+                throw ex;
+            }
+            
+        }
         if (cmd.hasOption(HELP)) {
             showHelp();
         }
@@ -163,7 +183,7 @@ public class XMindToLatexExporter {
                     setEnvironmentTemplates(levelAsInt, start, end);
                 }
                 catch (NumberFormatException e) {
-                    ParseException ex = new ParseException("The level argument of option e has to be an integer.");
+                    ParseException ex = new ParseException("The level argument of option " + ENVIRONMENT + " has to be an integer.");
                     ex.addSuppressed(e);
                     throw ex;
                 }
@@ -177,9 +197,17 @@ public class XMindToLatexExporter {
                 try {
                     int levelAsInt = Integer.parseInt(level);      
                     setLevelTemplate(levelAsInt, template);
+                    // warn, if added templates will not be used, because max level is set
+                    int maxLvl = getMaxLevel();
+                    if (maxLvl != -1 && levelAsInt > maxLvl) {
+                        throw new ParseException("The added template for level " 
+                                + levelAsInt + 
+                                " will not be used because max template level has been configured to level " 
+                                + maxLvl);
+                    }
                 }
                 catch (NumberFormatException e) {
-                    ParseException ex = new ParseException("The level argument of option t has to be an integer.");
+                    ParseException ex = new ParseException("The level argument of option " + LEVEL + " has to be an integer.");
                     ex.addSuppressed(e);
                     throw ex;
                 }
@@ -247,54 +275,6 @@ public class XMindToLatexExporter {
         }
     }
     
-    @SuppressWarnings("static-access")
-    private Options getOptions() {
-        Options o = new Options();
-        o.addOption(OptionBuilder.withArgName("input file")
-                                .withLongOpt("input")
-                                .withDescription("Required input file name.")
-                                .hasArg(true)
-                                .isRequired()
-                                .withType(PatternOptionBuilder.FILE_VALUE)
-                                .create(INPUT));
-        o.addOption(OptionBuilder.withArgName("force")
-                                .withLongOpt("force")
-                                .withDescription("Force overwrite existing files (optional).")
-                                .hasArg(false)
-                                .isRequired(false)
-                                .create(FORCE));
-        o.addOption(OptionBuilder.withArgName("output file")
-                                .withLongOpt("output")
-                                .withDescription("Output file name (optional). Default output file is \"<input file>.tex.\"")
-                                .hasArg()
-                                .isRequired(false)
-                                .withType(PatternOptionBuilder.FILE_VALUE)
-                                .create(OUTPUT));
-        o.addOption(OptionBuilder.withArgName("help")
-                                 .withLongOpt("help")
-                                 .withDescription("Prints this help message.")
-                                 .hasArg(false)
-                                 .isRequired(false)
-                                 .create(HELP));
-        o.addOption(OptionBuilder.withArgName("level> <start> <end")
-                                 .withLongOpt("env")
-                                 .hasArgs(3)
-                                 .withDescription("Sets the start and end environment templates for the given level (optional). " +
-                                 		"Templates must be either loadable from the classpath with the given full qualified name (no file extension, " +
-                                 		"directories separated by a '.', or as a file (with '.ftl' extension, directories separated by a path separator).")
-                                 .isRequired(false)
-                                 .create(ENVIRONMENT));
-        o.addOption(OptionBuilder.withArgName("level> <template")
-                                 .withLongOpt("level-template")
-                                 .withDescription("Sets the template that is to be used for the given level (optional). " +
-                                         "Templates must be either loadable from the classpath with the given full qualified name (no file extension, " +
-                                         "directories separated by a '.', or as a file (with '.ftl' extension, directories separated by a path separator).")
-                                 .hasArgs(2)
-                                 .isRequired(false)
-                                 .create(LEVEL));
-        return o;
-    }
-    
     /**
      * @param depthCounter2
      * @return
@@ -325,12 +305,18 @@ public class XMindToLatexExporter {
 
     private String getTextForLevel(int level, String text) {
         String template;
-        
+        // we are using the undefined template, if the current level is higher
+        // then the amount of registered templates
         if (level >= templates.size()) {
             template = templates.get(0);
         }
         else if (level <= 0) {
             return "";
+        }
+        // we are using the undefined template if the current level is higher
+        // then the max level and the max level is set
+        else if (level > getMaxLevel() && getMaxLevel() != -1) {
+            template = templates.get(0);
         }
         else {
             template = templates.get(level);
@@ -459,5 +445,22 @@ public class XMindToLatexExporter {
     protected void showHelp() {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("xmind2latex", this.options);
+    }
+
+    /**
+     * @return The maximal level used for template processing. -1 corresponds to
+     * 'process all available templates'.
+     */
+    public int getMaxLevel() {
+        return maxLevel;
+    }
+
+    /**
+     * Sets the maximal level used for template processing. -1 corresponds to
+     * 'process all available templates'.
+     * @param maxLevel the maximal level to set
+     */
+    public void setMaxLevel(int maxLevel) {
+        this.maxLevel = maxLevel;
     }
 }

@@ -47,4 +47,6 @@ public class Parameters {
     
     public static final char OUTPUT = 'o';
     
+    public static final char TEMPLATE_LEVEL = 't';
+    
 }

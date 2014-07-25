@@ -17,6 +17,7 @@
 package de.haber.xmind2latex;
 
 import static de.haber.xmind2latex.XMindToLatexExporter.TEMPLATE_FOLDER;
+import static de.haber.xmind2latex.Parameters.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -162,6 +163,106 @@ public class XMindToLatexExporterConfigurationTest {
             exporter.configure(args);
             assertEquals(5, exporter.getTemplates().size());
             assertEquals(expectedTemplate, exporter.getTemplates().get(2));
+        }
+        catch (ParseException e) {
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testConfigureLevelAndMaxLevelInvalid() {
+        File in = new File("src/test/resources/content.xml");
+        
+        String expectedTemplate = TEMPLATE_FOLDER + "paragraph"; 
+        String[] args = new String[] {
+                "-" + INPUT, in.getPath(),
+                "-" + LEVEL, "3", expectedTemplate,
+                "-" + TEMPLATE_LEVEL, "2"
+        };
+        XMindToLatexExporter exporter;
+        try {
+            exporter = new XMindToLatexExporter();
+            exporter.configure(args);
+            fail("ParseException expected");
+        }
+        catch (Exception e) {
+            assertTrue(e instanceof ParseException);
+        }
+    }
+    
+    @Test
+    public void testConfigureLevelAndMaxLevelValid() {
+        File in = new File("src/test/resources/content.xml");
+        
+        String expectedTemplate = TEMPLATE_FOLDER + "paragraph"; 
+        String[] args = new String[] {
+                "-" + INPUT, in.getPath(),
+                "-" + LEVEL, "2", expectedTemplate,
+                "-" + TEMPLATE_LEVEL, "2"
+        };
+        XMindToLatexExporter exporter;
+        try {
+            exporter = new XMindToLatexExporter();
+            exporter.configure(args);
+            assertEquals(5, exporter.getTemplates().size());
+            assertEquals(expectedTemplate, exporter.getTemplates().get(2));
+            assertEquals(2, exporter.getMaxLevel());
+        }
+        catch (ParseException e) {
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testConfigureMaxLevel() {
+        File in = new File("src/test/resources/content.xml");
+         
+        String[] args = new String[] {
+                "-" + INPUT, in.getPath(),
+                "-" + TEMPLATE_LEVEL, "2"
+        };
+        XMindToLatexExporter exporter;
+        try {
+            exporter = new XMindToLatexExporter();
+            exporter.configure(args);
+            assertEquals(2, exporter.getMaxLevel());
+        }
+        catch (ParseException e) {
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testConfigureNegativeMaxLevel() {
+        File in = new File("src/test/resources/content.xml");
+         
+        String[] args = new String[] {
+                "-" + INPUT, in.getPath(),
+                "-" + TEMPLATE_LEVEL, "-2"
+        };
+        XMindToLatexExporter exporter;
+        try {
+            exporter = new XMindToLatexExporter();
+            exporter.configure(args);
+            fail("ParseException expected due to negative max level.");
+        }
+        catch (Exception e) {
+            assertTrue(e instanceof ParseException);
+        }
+    }
+    
+    @Test
+    public void testConfigureMaxLevelDefault() {
+        File in = new File("src/test/resources/content.xml");
+         
+        String[] args = new String[] {
+                "-" + INPUT, in.getPath(),
+        };
+        XMindToLatexExporter exporter;
+        try {
+            exporter = new XMindToLatexExporter();
+            exporter.configure(args);
+            assertEquals(-1, exporter.getMaxLevel());
         }
         catch (ParseException e) {
             fail(e.getMessage());
