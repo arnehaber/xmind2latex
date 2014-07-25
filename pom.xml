@@ -115,9 +115,6 @@
           <useWildcardClassPath>true</useWildcardClassPath>
           <repositoryLayout>flat</repositoryLayout>
           <assembleDirectory>${assemble.dir}</assembleDirectory>
-          <binFileExtensions>
-            <unix>.sh</unix>
-          </binFileExtensions>
         </configuration>
       </plugin>
       <plugin>
