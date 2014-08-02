@@ -16,7 +16,7 @@ This way, chapters of a book may be structured as a mind map that is then export
 
 ## Command Line Parameters
 
-<iframe src="doc/commands.txt" scrolling="no" height="440">
+<iframe src="doc/commands.txt" scrolling="no" height="480">
 
     usage: xmind2latex
      -e,--env <level> <start> <end>           Sets the start and end environment templates for the given

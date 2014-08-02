@@ -113,6 +113,11 @@ public class XMindToLatexExporter {
     );
     
     private final Configuration templateConfig;
+    
+    /**
+     * Stores indent strings for a specific level.
+     */
+    private final Map<Integer, String> level2indent;
 
     /**
      * Creates a new {@link XMindToLatexExporter}.
@@ -123,6 +128,7 @@ public class XMindToLatexExporter {
         templateConfig.setClassForTemplateLoading(getClass(), "");
         templateConfig.setTemplateLoader(new XMindTemplateLoader(getClass().getClassLoader()));
         templateConfig.setLocalizedLookup(false);
+        level2indent = new HashMap<Integer, String>();
     }
     
     /**
@@ -348,9 +354,7 @@ public class XMindToLatexExporter {
         data.put("level", "" + level);
         data.put("innerLevel", "" + inner);
         StringBuilder currentIndent = new StringBuilder();
-        for ( int i = 0; i < inner; i++) {
-            currentIndent.append(INDENT);
-        }
+        currentIndent.append(getIndention(inner));
         data.put("indent", currentIndent.toString());
         
 
@@ -366,10 +370,28 @@ public class XMindToLatexExporter {
     }
     
     /**
-     * @param text2
-     * @throws IOException
+     * 
+     * @param inner indention level
+     * @return an indention string for the given level 
      */
-    private void save(String text2) throws IOException {
+    private String getIndention(int inner) {
+    	if (!level2indent.containsKey(inner)) {
+    		StringBuilder sb = new StringBuilder();
+    		for ( int i = 0; i < inner; i++) {
+    			sb.append(INDENT);
+    		}
+    		level2indent.put(inner, sb.toString());
+    	}
+		return level2indent.get(inner);
+	}
+
+	/**
+     * Stores the given <b>content</b> into the configured target file.
+     *  
+     * @param content content to save
+     * @throws IOException either writer {@link IOException}, or if the target file already exists and fore overwrite is not anabled.
+     */
+    private void save(String content) throws IOException {
         File tf = getTargetFile();
         if (tf.getParentFile() != null && !tf.getParentFile().exists()) {
             tf.getParentFile().mkdirs();
@@ -377,7 +399,7 @@ public class XMindToLatexExporter {
         if (!tf.exists() || isOverwriteExistingFile()) {
             
             PrintWriter pw = new PrintWriter(tf);
-            pw.write(text2);
+            pw.write(content);
             pw.close();
         }
         else {
