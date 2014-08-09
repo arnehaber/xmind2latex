@@ -16,7 +16,7 @@
  */
 package de.haber.xmind2latex;
 
-import static de.haber.xmind2latex.XMindToLatexExporter.TEMPLATE_FOLDER;
+import static de.haber.xmind2latex.XMindToLatexExporter.TEMPLATE_PACKAGE;
 import static de.haber.xmind2latex.Parameters.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -49,10 +49,10 @@ public class XMindToLatexExporterConfigurationTest {
     public void testConfigureEnvironment() {
         File in = new File("src/test/resources/content.xml");
          
-        String expectedStart5 = TEMPLATE_FOLDER + "env.startEnumerate";
-        String expectedEnd5 = TEMPLATE_FOLDER + "env.endEnumerate";
-        String expectedStart6 = TEMPLATE_FOLDER + "env.startItemize";
-        String expectedEnd6 = TEMPLATE_FOLDER + "env.endItemize";
+        String expectedStart5 = TEMPLATE_PACKAGE + "env.startEnumerate";
+        String expectedEnd5 = TEMPLATE_PACKAGE + "env.endEnumerate";
+        String expectedStart6 = TEMPLATE_PACKAGE + "env.startItemize";
+        String expectedEnd6 = TEMPLATE_PACKAGE + "env.endItemize";
         
         String[] args = new String[] {
                 "-i", in.getPath(),
@@ -78,10 +78,10 @@ public class XMindToLatexExporterConfigurationTest {
     public void testConfigureFaultyEnvironment() {
         File in = new File("src/test/resources/content.xml");
          
-        String expectedStart5 = TEMPLATE_FOLDER + "env.startEnumerate";
-        String expectedEnd5 = TEMPLATE_FOLDER + "env.endEnumerate";
-        String expectedStart6 = TEMPLATE_FOLDER + "env.startItemize";
-        String expectedEnd6 = TEMPLATE_FOLDER + "env.endItemize";
+        String expectedStart5 = TEMPLATE_PACKAGE + "env.startEnumerate";
+        String expectedEnd5 = TEMPLATE_PACKAGE + "env.endEnumerate";
+        String expectedStart6 = TEMPLATE_PACKAGE + "env.startItemize";
+        String expectedEnd6 = TEMPLATE_PACKAGE + "env.endItemize";
         
         String[] args = new String[] {
                 "-i", in.getPath(),
@@ -152,7 +152,7 @@ public class XMindToLatexExporterConfigurationTest {
     public void testConfigureLevel() {
         File in = new File("src/test/resources/content.xml");
         
-        String expectedTemplate = TEMPLATE_FOLDER + "paragraph"; 
+        String expectedTemplate = TEMPLATE_PACKAGE + "paragraph"; 
         String[] args = new String[] {
                 "-i", in.getPath(),
                 "-l", "2", expectedTemplate
@@ -173,7 +173,7 @@ public class XMindToLatexExporterConfigurationTest {
     public void testConfigureLevelAndMaxLevelInvalid() {
         File in = new File("src/test/resources/content.xml");
         
-        String expectedTemplate = TEMPLATE_FOLDER + "paragraph"; 
+        String expectedTemplate = TEMPLATE_PACKAGE + "paragraph"; 
         String[] args = new String[] {
                 "-" + INPUT, in.getPath(),
                 "-" + LEVEL, "3", expectedTemplate,
@@ -194,7 +194,7 @@ public class XMindToLatexExporterConfigurationTest {
     public void testConfigureLevelAndMaxLevelValid() {
         File in = new File("src/test/resources/content.xml");
         
-        String expectedTemplate = TEMPLATE_FOLDER + "paragraph"; 
+        String expectedTemplate = TEMPLATE_PACKAGE + "paragraph"; 
         String[] args = new String[] {
                 "-" + INPUT, in.getPath(),
                 "-" + LEVEL, "2", expectedTemplate,
@@ -273,7 +273,7 @@ public class XMindToLatexExporterConfigurationTest {
     public void testConfigureLevelAboveMax() {
         File in = new File("src/test/resources/content.xml");
         
-        String expectedTemplate = TEMPLATE_FOLDER + "paragraph"; 
+        String expectedTemplate = TEMPLATE_PACKAGE + "paragraph"; 
         String[] args = new String[] {
                 "-i", in.getPath(),
                 "-l", "10", expectedTemplate
@@ -310,7 +310,7 @@ public class XMindToLatexExporterConfigurationTest {
     public void testConfigureLevelMax() {
         File in = new File("src/test/resources/content.xml");
         
-        String expectedTemplate = TEMPLATE_FOLDER + "paragraph"; 
+        String expectedTemplate = TEMPLATE_PACKAGE + "paragraph"; 
         String[] args = new String[] {
                 "-i", in.getPath(),
                 "-l", "5", expectedTemplate

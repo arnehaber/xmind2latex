@@ -74,51 +74,53 @@ import freemarker.template.Template;
  */
 public class XMindToLatexExporter {
         
-    public static final String NEW_LINE = "\n";
-    
-    protected static final String TEMPLATE_FOLDER = "de.haber.xmind2latex.templates.";
-    public static final String TEXT = "#text";
-    
-    public static final String TITLE = "title";
-    public static final String TOPIC = "topic";
-    
     /** Used as indention. */
     public static final String INDENT = "  ";
+    
+    public static final String NEW_LINE = "\n";
+    public static final String TEMPLATE_PACKAGE = "de.haber.xmind2latex.templates.";
+    
+    public static final String TEXT = "#text";
+    public static final String TITLE = "title";
+    
+    public static final String TOPIC = "topic";
     
     private int depthCounter = 0;
     private Map<Integer, String> level2endTemplate = Maps.newHashMap();
     
+    /**
+     * Stores indent strings for a specific level.
+     */
+    private final Map<Integer, String> level2indent;
+    
     private Map<Integer, String> level2startTemplate = Maps.newHashMap();
-    
-    private final Options options;
-    private boolean overwriteExistingFile = false;
-    
     /**
      * The maximal level used for template processing. -1 corresponds to
      * 'process all available templates'.
      */
     private int maxLevel = -1;
     
+    private final Options options;
+    
+    private boolean overwriteExistingFile = false;
+    
     /**
      * Target file.
      */
     private File targetFile;
     
-    private List<String> templates = Lists.newArrayList(
-            TEMPLATE_FOLDER + "undefined",
-            TEMPLATE_FOLDER + "chapter",
-            TEMPLATE_FOLDER + "section",
-            TEMPLATE_FOLDER + "subsection",
-            TEMPLATE_FOLDER + "subsubsection"
-    );
-    
     private final Configuration templateConfig;
     
-    /**
-     * Stores indent strings for a specific level.
-     */
-    private final Map<Integer, String> level2indent;
+    private List<String> templates = Lists.newArrayList(
+            TEMPLATE_PACKAGE + "undefined",
+            TEMPLATE_PACKAGE + "chapter",
+            TEMPLATE_PACKAGE + "section",
+            TEMPLATE_PACKAGE + "subsection",
+            TEMPLATE_PACKAGE + "subsubsection"
+    );
 
+    private InputStream xMindSourceStream;
+    
     /**
      * Creates a new {@link XMindToLatexExporter}.
      */
@@ -285,6 +287,30 @@ public class XMindToLatexExporter {
     }
     
     /**
+     * 
+     * @param inner indention level
+     * @return an indention string for the given level 
+     */
+    private String getIndention(int inner) {
+    	if (!level2indent.containsKey(inner)) {
+    		StringBuilder sb = new StringBuilder();
+    		for ( int i = 0; i < inner; i++) {
+    			sb.append(INDENT);
+    		}
+    		level2indent.put(inner, sb.toString());
+    	}
+		return level2indent.get(inner);
+	}
+
+    /**
+     * @return The maximal level used for template processing. -1 corresponds to
+     * 'process all available templates'.
+     */
+    public int getMaxLevel() {
+        return maxLevel;
+    }
+
+    /**
      * @param depthCounter2
      * @return
      */
@@ -304,14 +330,16 @@ public class XMindToLatexExporter {
     public File getTargetFile() {
         return targetFile;
     }
-
+    
     /**
      * @return the templates
      */
     public List<String> getTemplates() {
         return templates;
     }
-
+    
+    
+    
     private String getTextForLevel(int level, String text) {
         String template;
         // we are using the undefined template, if the current level is higher
@@ -336,14 +364,13 @@ public class XMindToLatexExporter {
     public InputStream getxMindSourceAsStream() {
         return this.xMindSourceStream;
     }
-    
-    /**
+
+	/**
      * @return the overwriteExistingFile
      */
     public boolean isOverwriteExistingFile() {
         return overwriteExistingFile;
     }
-    
     
     
     private String processTemplate(String template, int level, String text) {
@@ -370,26 +397,10 @@ public class XMindToLatexExporter {
     }
     
     /**
-     * 
-     * @param inner indention level
-     * @return an indention string for the given level 
-     */
-    private String getIndention(int inner) {
-    	if (!level2indent.containsKey(inner)) {
-    		StringBuilder sb = new StringBuilder();
-    		for ( int i = 0; i < inner; i++) {
-    			sb.append(INDENT);
-    		}
-    		level2indent.put(inner, sb.toString());
-    	}
-		return level2indent.get(inner);
-	}
-
-	/**
      * Stores the given <b>content</b> into the configured target file.
      *  
      * @param content content to save
-     * @throws IOException either writer {@link IOException}, or if the target file already exists and fore overwrite is not anabled.
+     * @throws IOException either writer {@link IOException}, or if the target file already exists and fore overwrite is not enabled.
      */
     private void save(String content) throws IOException {
         File tf = getTargetFile();
@@ -406,7 +417,6 @@ public class XMindToLatexExporter {
             throw new FileAlreadyExistsException(tf.getAbsolutePath(), "", "If you want to overwrite existing files use param " + options.getOption("f").getOpt());
         }
     }
-    
     
     public void setEnvironmentTemplates(int level, String startTemplate, String endTemplate) {
         level2startTemplate.put(level, startTemplate);
@@ -432,6 +442,15 @@ public class XMindToLatexExporter {
     }
     
     /**
+     * Sets the maximal level used for template processing. -1 corresponds to
+     * 'process all available templates'.
+     * @param maxLevel the maximal level to set
+     */
+    public void setMaxLevel(int maxLevel) {
+        this.maxLevel = maxLevel;
+    }
+    
+    /**
      * @param overwriteExistingFile the overwriteExistingFile to set
      */
     public void setOverwriteExistingFile(boolean overwriteExistingFile) {
@@ -444,7 +463,7 @@ public class XMindToLatexExporter {
     public void setTargetFile(File targetFile) {
         this.targetFile = targetFile;
     }
-    
+
     /**
      * @param xMindSource the xMindSource to set, must not be null
      * 
@@ -466,31 +485,12 @@ public class XMindToLatexExporter {
             xMindSourceStream = FileUtils.openInputStream(usedFile);
         }
     }
-    
-    private InputStream xMindSourceStream;
-    
+
     /**
      * 
      */
     protected void showHelp() {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("xmind2latex", this.options);
-    }
-
-    /**
-     * @return The maximal level used for template processing. -1 corresponds to
-     * 'process all available templates'.
-     */
-    public int getMaxLevel() {
-        return maxLevel;
-    }
-
-    /**
-     * Sets the maximal level used for template processing. -1 corresponds to
-     * 'process all available templates'.
-     * @param maxLevel the maximal level to set
-     */
-    public void setMaxLevel(int maxLevel) {
-        this.maxLevel = maxLevel;
     }
 }

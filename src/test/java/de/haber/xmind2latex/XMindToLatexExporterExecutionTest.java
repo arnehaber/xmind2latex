@@ -16,7 +16,7 @@
  */
 package de.haber.xmind2latex;
 
-import static de.haber.xmind2latex.XMindToLatexExporter.TEMPLATE_FOLDER;
+import static de.haber.xmind2latex.XMindToLatexExporter.TEMPLATE_PACKAGE;
 import static de.haber.xmind2latex.Parameters.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -163,10 +163,10 @@ public class XMindToLatexExporterExecutionTest {
                 "-i", in.getAbsolutePath(),
                 "-o", out.getAbsolutePath(),
                 "-f",
-                "-e", "4", TEMPLATE_FOLDER + "env.startEnumerate", TEMPLATE_FOLDER + "env.endEnumerate",
-                "-e", "5", TEMPLATE_FOLDER + "env.startItemize", TEMPLATE_FOLDER + "env.endItemize",
-                "-l", "4", TEMPLATE_FOLDER + "env.item",
-                "-l", "5", TEMPLATE_FOLDER + "env.item"
+                "-e", "4", TEMPLATE_PACKAGE + "env.startEnumerate", TEMPLATE_PACKAGE + "env.endEnumerate",
+                "-e", "5", TEMPLATE_PACKAGE + "env.startItemize", TEMPLATE_PACKAGE + "env.endItemize",
+                "-l", "4", TEMPLATE_PACKAGE + "env.item",
+                "-l", "5", TEMPLATE_PACKAGE + "env.item"
         };
         XMindToLatexExporter exporter;
         try {
@@ -195,8 +195,8 @@ public class XMindToLatexExporterExecutionTest {
                 "-i", in.getAbsolutePath(),
                 "-o", out.getAbsolutePath(),
                 "-f",
-                "-l", "7", TEMPLATE_FOLDER + "env.item",
-                "-l", "8", TEMPLATE_FOLDER + "env.item"
+                "-l", "7", TEMPLATE_PACKAGE + "env.item",
+                "-l", "8", TEMPLATE_PACKAGE + "env.item"
         };
         XMindToLatexExporter exporter;
         try {
