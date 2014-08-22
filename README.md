@@ -89,6 +89,8 @@ In templates, the following variables are available:
 * _indent_        - indentions (spaces) corresponding to the current inner level
 
 ## Version History
+### 1.2.0
+
 ### 1.1.0
 * Read xml as well as XMind source files using an input stream to omit extraction of XMind files (issue [#2](https://github.com/arnehaber/xmind2latex/issues/2)). 
 * Removed '.sh' from linux execution script (issue [#3](https://github.com/arnehaber/xmind2latex/issues/3)).
