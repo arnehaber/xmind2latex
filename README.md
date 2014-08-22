@@ -22,7 +22,7 @@ The latest XMind to Latex release can be found [here](https://github.com/arnehab
 
 <iframe src="doc/commands.txt" scrolling="no" height="480">
 Please note that the following list may be outdated. A complete list of the current command line parameters is contained
-in the _README.html_ file of the release.
+in the <b>README.html</b> file of the <a href="https://github.com/arnehaber/xmind2latex/releases/latest" target="_blank">release</a>.
 <pre><code>
     usage: xmind2latex
      -e,--env <level> <start> <end>           Sets the start and end environment templates for the given
@@ -123,7 +123,8 @@ All test input files are downloaded from [http://www.xmind.net/share/](http://ww
 
 <iframe src="license/dependencies.txt" scrolling="no" height="130">
 
-A list of dependencies is contained in the documentation of the release.
+A list of dependencies is contained in the <b>README.html</b> file of the 
+<a href="https://github.com/arnehaber/xmind2latex/releases/latest" target="_blank">release</a>.
 
 </iframe>
 
