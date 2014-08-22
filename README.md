@@ -2,6 +2,9 @@
 XMind to Latex is a tool that reads a XMind mind map and derives a structured latex document. 
 This way, chapters of a book may be structured as a mind map that is then exported to latex.   
 
+## Release
+The latest XMind to Latex release can be found [here](https://github.com/arnehaber/xmind2latex/releases/latest) 
+
 ## Folder and File Structure
 * _bin_ - start scripts
     * _xmind2latex.bat_ - windows start script
@@ -14,10 +17,13 @@ This way, chapters of a book may be structured as a mind map that is then export
     * _*.jar_ project dependencies
 * _README.html_ - this readme file
 
+
 ## Command Line Parameters
 
 <iframe src="doc/commands.txt" scrolling="no" height="480">
-
+Please note that the following list may be outdated. A complete list of the current command line parameters is contained
+in the _README.html_ file of the release.
+<pre><code>
     usage: xmind2latex
      -e,--env <level> <start> <end>           Sets the start and end environment templates for the given
                                               level (optional). Templates must be either loadable from
@@ -37,7 +43,7 @@ This way, chapters of a book may be structured as a mind map that is then export
      -o,--output <output file>                Output file name (optional). Default output file is
                                               "<input file>.tex."
      -t,--template-level <template level>     Maximal level for template usage.                                              
-
+</code></pre>
 </iframe>
 
 
@@ -84,10 +90,10 @@ In templates, the following variables are available:
 
 ## Version History
 ### 1.1.0
-* Read xml as well as XMind source files using an input stream to omit extraction of XMind files (issue #2).
-* Removed '.sh' from linux execution script (issue #3).
-* Added parameter 't' to control until which level templates are used (issue #4).
-* Undefined entries are now indented according to their level (issue #5).
+* Read xml as well as XMind source files using an input stream to omit extraction of XMind files (issue [#2](https://github.com/arnehaber/xmind2latex/issues/2)). 
+* Removed '.sh' from linux execution script (issue [#3](https://github.com/arnehaber/xmind2latex/issues/3)).
+* Added parameter 't' to control until which level templates are used (issue [#4](https://github.com/arnehaber/xmind2latex/issues/4)).
+* Undefined entries are now indented according to their level (issue [#5](https://github.com/arnehaber/xmind2latex/issues/5)).
 
 ### 1.0.0 
 * initial release
@@ -117,7 +123,7 @@ All test input files are downloaded from [http://www.xmind.net/share/](http://ww
 
 <iframe src="license/dependencies.txt" scrolling="no" height="130">
 
-A list of dependencies is given [here](./license/dependencies.txt "Dependencies").
+A list of dependencies is contained in the documentation of the release.
 
 </iframe>
 
