@@ -94,6 +94,7 @@ In templates, the following variables are available:
 * Removed '.sh' from linux execution script (issue [#3](https://github.com/arnehaber/xmind2latex/issues/3)).
 * Added parameter 't' to control until which level templates are used (issue [#4](https://github.com/arnehaber/xmind2latex/issues/4)).
 * Undefined entries are now indented according to their level (issue [#5](https://github.com/arnehaber/xmind2latex/issues/5)).
+* Set +x flag of the generated Linux execution script (issue [#6](https://github.com/arnehaber/xmind2latex/issues/6)).
 
 ### 1.0.0 
 * initial release
