@@ -138,9 +138,14 @@
                 <copy todir="${licence.dir}">
                   <fileset dir="${basedir}/src/main/resources/de/haber/xmind2latex/markdown/licence/" />
                 </copy>
+                <chmod file="${assemble.dir}/bin/xmind2latex" perm="ugo+rx"/>
                 <zip
-                  destfile="${project.build.directory}/${project.artifactId}-${project.version}.zip"
-                  basedir="${assemble.dir}" includes="**/*">
+                  destfile="${project.build.directory}/${project.artifactId}-${project.version}.zip">
+                  <zipfileset dir="${assemble.dir}">
+                    <include name="**/*" />
+                    <exclude name="bin/xmind2latex" />
+                  </zipfileset>
+                  <zipfileset dir="${assemble.dir}" includes="bin/xmind2latex" filemode="755" />
                 </zip>
               </target>
             </configuration>
