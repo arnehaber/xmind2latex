@@ -6,7 +6,8 @@ This way, chapters of a book may be structured as a mind map that is then export
 The latest XMind to Latex release can be found [here](https://github.com/arnehaber/xmind2latex/releases/latest)
 
 ## Build Status
-[![Build Status](https://travis-ci.org/arnehaber/xmind2latex.svg?branch=master)](https://travis-ci.org/arnehaber/xmind2latex) 
+[![Build Status](https://travis-ci.org/arnehaber/xmind2latex.svg?branch=master)](https://travis-ci.org/arnehaber/xmind2latex)
+[![Coverage Status](https://coveralls.io/repos/arnehaber/xmind2latex/badge.png?branch=master)](https://coveralls.io/r/arnehaber/xmind2latex?branch=master)
 
 ## License
 
