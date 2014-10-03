@@ -205,7 +205,7 @@
       <plugin>
         <groupId>com.ruleoftech</groupId>
         <artifactId>markdown-page-generator-plugin</artifactId>
-        <version>0.4</version>
+        <version>0.6</version>
         <executions>
           <execution>
             <id>generate doc</id>
@@ -216,8 +216,9 @@
             <configuration>
               <headerHtmlFile>${basedir}/src/main/resources/de/haber/xmind2latex/markdown/html/header.html</headerHtmlFile>
               <footerHtmlFile>${basedir}/src/main/resources/de/haber/xmind2latex/markdown/html/footer.html</footerHtmlFile>
-              <inputDirectory>${basedir}</inputDirectory>
+              <inputDirectory>${basedir}/src/main/resources/de/haber/xmind2latex/markdown</inputDirectory>
               <outputDirectory>${assemble.dir}</outputDirectory>
+              <defaultTitle>${project.artifactId} ${project.version}</defaultTitle>
             </configuration>
           </execution>
         </executions>
