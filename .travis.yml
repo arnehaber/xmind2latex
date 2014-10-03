@@ -3,4 +3,4 @@ jdk:
   - oraclejdk7
 
 after_success:
-  - mvn clean cobertura:cobertura coveralls:cobertura
+  - mvn cobertura:cobertura coveralls:cobertura
