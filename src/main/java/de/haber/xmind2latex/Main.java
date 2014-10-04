@@ -23,14 +23,27 @@ import org.apache.commons.cli.ParseException;
  *
  * <br>
  * <br>
- * Copyright (c) 2014 RWTH Aachen. All rights reserved.
  *
  * @author  (last commit) $Author$
  * @version $Date$<br>
  *          $Revision$
  */
 public class Main {
+	
+	/**
+	 * Private default constructor to prevent utility class instantiation.
+	 * 
+	 * @since 1.2.0
+	 */
+	private Main() {
+		
+	}
     
+	/**
+	 * Executes a {@link XMindToLatexExporter} with the given arguments.
+	 * 
+	 * @param args configuration arguments.
+	 */
     public static void main(String[] args) {
         XMindToLatexExporter tool = new XMindToLatexExporter();
         try {

@@ -38,6 +38,14 @@ import org.apache.commons.cli.PatternOptionBuilder;
  */
 class CliOptionBuilder {
     
+	/**
+	 * Private default constructor to prevent utility class instantiation.
+	 * @since 1.2.0
+	 */
+	private CliOptionBuilder() {
+		
+	}
+	
     @SuppressWarnings("static-access")
     /**
      * 

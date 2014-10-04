@@ -3,5 +3,5 @@ jdk:
   - oraclejdk7
 
 after_success:
-  - mvn -DargLine="-XX:-UseSplitVerifier" cobertura:cobertura coveralls:cobertura
+  - mvn cobertura:cobertura coveralls:cobertura
   

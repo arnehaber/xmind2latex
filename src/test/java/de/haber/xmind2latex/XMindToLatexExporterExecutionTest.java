@@ -235,6 +235,32 @@ public class XMindToLatexExporterExecutionTest {
     }
     
     @Test
+    public void testExecuteWithEmptyNode() {
+        File in = new File("src/test/resources/WithEmptyNode.xmind");
+        File out = new File("target/testout/WithEmptyNode.tex");
+        out.delete();
+       
+        String[] args = new String[] {
+                "-" + INPUT, in.getPath(),
+                "-" + OUTPUT, out.getAbsolutePath()
+        };
+        XMindToLatexExporter exporter;
+        try {
+            exporter = new XMindToLatexExporter();
+            exporter.configure(args);
+            exporter.convert();
+            assertTrue(out.exists());
+            String content = FileUtils.readFileToString(out);
+            assertTrue(content.contains("WithEmptyNode"));
+            assertTrue(content.contains("NotEmpty"));
+            assertTrue(content.contains("but we can see this text"));
+        }
+        catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
     public void testExternalTemplate() {
         File in = new File("src/test/resources/content.xml");
         File out = new File("target/testout/testExternalTemplate.tex");
@@ -267,6 +293,30 @@ public class XMindToLatexExporterExecutionTest {
         File out = new File("target/testout/testFailIfExternalTemplateNotExists.tex");
         out.delete();
         String expectedTemplate = "src/test/resources/someExternalTemplateMoep.ftl"; 
+        String[] args = new String[] {
+                "-i", in.getPath(),
+                "-l", "2", expectedTemplate,
+                "-o", out.getAbsolutePath()
+        };
+        XMindToLatexExporter exporter;
+        try {
+            exporter = new XMindToLatexExporter();
+            exporter.configure(args);
+            exporter.convert();
+        }
+        catch (Exception e) {
+            assertTrue(e instanceof TemplateNotExistsException);
+            assertEquals(expectedTemplate, ((TemplateNotExistsException) e).getTemplate());
+        }
+    }
+    
+    
+    @Test
+    public void testFailIfQualifiedTemplateNotExists() {
+        File in = new File("src/test/resources/content.xml");
+        File out = new File("target/testout/testFailIfExternalTemplateNotExists.tex");
+        out.delete();
+        String expectedTemplate = TEMPLATE_PACKAGE + "does.not.Exist"; 
         String[] args = new String[] {
                 "-i", in.getPath(),
                 "-l", "2", expectedTemplate,

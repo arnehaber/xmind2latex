@@ -65,23 +65,16 @@ public class XMindTemplateLoader extends URLTemplateLoader {
      */
     @Override
     protected URL getURL(final String templateName) {
-        // Copying the parameter so the else-Block later in the method can
-        // reuse the original String.
-        String newName = templateName;
-        // Since the input is almost always dot separated, this method just
-        // goes ahead and converts it
-        // without checking, only in the rare case that this procedure is
-        // unsuccessful are
-        // alternatives considered
-        newName = newName.replace(".", "/").concat(FM_FILE_EXTENSION);
-        
-        URL result = classLoader.getResource(newName);
+    	// convert qualified to file name
+    	String filename = templateName.replace(".", "/").concat(FM_FILE_EXTENSION);    		
+    	    	
+    	// try to load URL as resource in case of template name is qualified.
+        URL result = classLoader.getResource(filename);
 
         // this is the case, if the original name has not been full qualified
         // but a reference to a file. Thus we load the URL as a file and do not
         // load it from classpath.
         if (result == null && templateName.endsWith(FM_FILE_EXTENSION)) {
-            result = classLoader.getResource(templateName);
             File f = new File(templateName);
             if (f.exists()) {
                 try {

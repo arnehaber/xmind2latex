@@ -253,10 +253,8 @@ public class XMindToLatexExporter {
             Node n = childNodes.item(i);
             if (n.getNodeName().equals(TEXT)) {
                 String text = n.getNodeValue().replace(NEW_LINE, " ").replace("\t", "").trim();
-                if (!text.isEmpty()) {
-                    sb.append(getTextForLevel(depthCounter, text));
-                    sb.append(NEW_LINE);
-                }
+                sb.append(getTextForLevel(depthCounter, text));
+                sb.append(NEW_LINE);
             }
             
             if (n.getNodeName().equals(TOPIC)) {
