@@ -16,17 +16,19 @@
  */
 package de.haber.xmind2latex;
 
-import static de.haber.xmind2latex.Parameters.ENVIRONMENT;
-import static de.haber.xmind2latex.Parameters.FORCE;
-import static de.haber.xmind2latex.Parameters.HELP;
-import static de.haber.xmind2latex.Parameters.INPUT;
-import static de.haber.xmind2latex.Parameters.LEVEL;
-import static de.haber.xmind2latex.Parameters.OUTPUT;
-import static de.haber.xmind2latex.Parameters.TEMPLATE_LEVEL;
+import static de.haber.xmind2latex.help.Parameters.ENVIRONMENT;
+import static de.haber.xmind2latex.help.Parameters.FORCE;
+import static de.haber.xmind2latex.help.Parameters.HELP;
+import static de.haber.xmind2latex.help.Parameters.INPUT;
+import static de.haber.xmind2latex.help.Parameters.LEVEL;
+import static de.haber.xmind2latex.help.Parameters.OUTPUT;
+import static de.haber.xmind2latex.help.Parameters.TEMPLATE_LEVEL;
 
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PatternOptionBuilder;
+
+import de.haber.xmind2latex.help.CoverageIgnore;
 
 /**
  * Builds command line options for {@link XMindToLatexExporter}.
@@ -42,6 +44,7 @@ class CliOptionBuilder {
 	 * Private default constructor to prevent utility class instantiation.
 	 * @since 1.2.0
 	 */
+	@CoverageIgnore
 	private CliOptionBuilder() {
 		
 	}

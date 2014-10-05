@@ -14,7 +14,7 @@
  *  limitations under the License.
  *  
  */
-package de.haber.xmind2latex;
+package de.haber.xmind2latex.help;
 
 /**
  * Contains parameter constants.

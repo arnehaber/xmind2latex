@@ -17,7 +17,7 @@
 package de.haber.xmind2latex;
 
 import static de.haber.xmind2latex.XMindToLatexExporter.TEMPLATE_PACKAGE;
-import static de.haber.xmind2latex.Parameters.*;
+import static de.haber.xmind2latex.help.Parameters.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
