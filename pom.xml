@@ -35,8 +35,8 @@
 
   <scm>
     <url>https://github.com/arnehaber/xmind2latex</url>
-    <developerConnection>https://github.com/arnehaber/xmind2latex</developerConnection>
-    <connection>https://github.com/arnehaber/xmind2latex</connection>
+    <developerConnection>scm:git:git://github.com/arnehaber/xmind2latex.git</developerConnection>
+    <connection>scm:git:git://github.com/arnehaber/xmind2latex.git</connection>
     <tag>master</tag>
   </scm>
 
