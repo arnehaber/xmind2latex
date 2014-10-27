@@ -193,6 +193,7 @@
             <goals>
               <goal>add-third-party</goal>
               <goal>update-project-license</goal>
+              <goal>update-file-header</goal>
             </goals>
           </execution>
         </executions>
@@ -205,6 +206,7 @@
           <includedScopes>compile</includedScopes>
           <includes>
             <include>**/*.java</include>
+            <include>**/*.ftl</include>
           </includes>
         </configuration>
       </plugin>
