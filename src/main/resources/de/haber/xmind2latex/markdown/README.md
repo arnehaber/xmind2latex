@@ -118,13 +118,13 @@ In templates, the following variables are available:
     See the License for the specific language governing permissions and
     limitations under the License.
 
-A copy of the complete license can be found [here](./license/LICENSE-2.0.txt "License").
+A copy of the complete license can be found [here](./license/LICENSE "License").
 
 All test input files are downloaded from [http://www.xmind.net/share/](http://www.xmind.net/share/).
 
 ## Dependencies
 
-<iframe src="license/dependencies.txt" scrolling="no" height="130">
+<iframe src="license/THIRD-PARTY.txt" scrolling="no" height="150">
 
 A list of dependencies is contained in the <b>README.html</b> file of the 
 <a href="https://github.com/arnehaber/xmind2latex/releases/latest" target="_blank">release</a>.
