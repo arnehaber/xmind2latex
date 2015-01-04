@@ -90,6 +90,7 @@ In templates, the following variables are available:
 
 ## Version History
 ### 1.2.0
+* UTF-8 output encoding (issue [#10](https://github.com/arnehaber/xmind2latex/issues/10)).
 * Escape line breaks in printed latex comments (issue [#8](https://github.com/arnehaber/xmind2latex/issues/8)).
 
 ### 1.1.0

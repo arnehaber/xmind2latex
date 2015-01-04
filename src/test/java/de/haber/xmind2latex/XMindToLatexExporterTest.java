@@ -19,6 +19,7 @@
  */
 package de.haber.xmind2latex;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -90,6 +91,39 @@ public class XMindToLatexExporterTest {
             assertTrue(undef.contains("    % 2 - a \n"));
             assertTrue(undef.contains("\n    %   - b"));
             assertTrue(undef.contains("\n    %   - c"));
+            
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testSave() {
+        File in = new File("src/test/resources/content.xml");
+        File out = new File("target/testout/result.tex");
+        if (out.exists()) {
+            out.delete();
+        }
+        String[] args = new String[] {
+                "-i", in.getAbsolutePath(),
+                "-o", out.getAbsolutePath()
+        };
+
+        XMindToLatexExporter exporter;
+        try {
+            exporter = new XMindToLatexExporter();
+            exporter.configure(args);
+            
+            Method save = exporter.getClass().getDeclaredMethod("save", String.class);
+            assertNotNull(save);
+            save.setAccessible(true);
+            
+            String txt = "ä ü ö ? ß Ü Ä Ö ";
+            save.invoke(exporter, txt);
+            String content = FileUtils.readFileToString(out, "UTF-8");
+            assertEquals(txt, content);
             
         }
         catch (Exception e) {

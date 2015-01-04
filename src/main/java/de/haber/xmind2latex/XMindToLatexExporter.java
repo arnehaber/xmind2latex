@@ -409,8 +409,7 @@ public class XMindToLatexExporter {
             tf.getParentFile().mkdirs();
         }
         if (!tf.exists() || isOverwriteExistingFile()) {
-            
-            PrintWriter pw = new PrintWriter(tf);
+            PrintWriter pw = new PrintWriter(tf, "UTF-8");
             pw.write(content);
             pw.close();
         }
