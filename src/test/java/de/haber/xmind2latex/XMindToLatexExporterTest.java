@@ -20,11 +20,15 @@
 package de.haber.xmind2latex;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.Method;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
@@ -65,6 +69,34 @@ public class XMindToLatexExporterTest {
         assertFalse(resultContent.isEmpty());
         System.setOut(old_out);
         os.close();
+    }
+    
+    @Test
+    public void testRemoveLineBreaksInComments() {
+        File in = new File("src/test/resources/content.xml");
+        String[] args = new String[] {
+                "-i", in.getAbsolutePath()
+        };
+        XMindToLatexExporter exporter;
+        try {
+            exporter = new XMindToLatexExporter();
+            exporter.configure(args);
+            
+            Method getTextForLevel = exporter.getClass().getDeclaredMethod("getTextForLevel", int.class, String.class);
+            assertNotNull(getTextForLevel);
+            getTextForLevel.setAccessible(true);
+            String txt = "a \nb \nc \n";
+            String undef = (String) getTextForLevel.invoke(exporter, 7, txt);
+            System.out.println(undef);
+            assertTrue(undef.contains("    % 2 - a \n"));
+            assertTrue(undef.contains("\n    %   - b"));
+            assertTrue(undef.contains("\n    %   - c"));
+            
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
     }
     
 }

@@ -17,4 +17,5 @@
  limitations under the License.
  #L%
 -->
-${indent}% ${innerLevel} - ${text}
+<#assign str = text?replace("\n", "\n" + indent + "%   - ")>
+${indent}% ${innerLevel} - ${str}
