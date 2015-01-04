@@ -87,7 +87,6 @@ public class XMindToLatexExporterTest {
             getTextForLevel.setAccessible(true);
             String txt = "a \nb \nc \n";
             String undef = (String) getTextForLevel.invoke(exporter, 7, txt);
-            System.out.println(undef);
             assertTrue(undef.contains("    % 2 - a \n"));
             assertTrue(undef.contains("\n    %   - b"));
             assertTrue(undef.contains("\n    %   - c"));
