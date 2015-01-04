@@ -90,6 +90,7 @@ In templates, the following variables are available:
 
 ## Version History
 ### 1.2.0
+* Escape line breaks in printed latex comments (issue [#8](https://github.com/arnehaber/xmind2latex/issues/8)).
 
 ### 1.1.0
 * Read xml as well as XMind source files using an input stream to omit extraction of XMind files (issue [#2](https://github.com/arnehaber/xmind2latex/issues/2)). 
