@@ -73,6 +73,7 @@ public class XMindToLatexExporterConfigurationTest {
             assertEquals("\\end{itemize}\n", exporter.getEndEnvironment(6));
         }
         catch (ParseException e) {
+          e.printStackTrace();
             fail(e.getMessage());
         }
     }
@@ -299,6 +300,86 @@ public class XMindToLatexExporterConfigurationTest {
         String[] args = new String[] {
                 "-i", in.getPath(),
                 "-l", "Hallo", "foo"
+        };
+        try {
+            new XMindToLatexExporter().configure(args);
+            fail("ParseException expected");
+        }
+        catch (Exception e) {
+            assertTrue(e instanceof ParseException);
+        }
+    }
+    
+    @Test
+    public void testConfigureLevelFailMissingArgument() {
+        File in = new File("src/test/resources/content.xml");
+        String[] args = new String[] {
+                "-i", in.getPath(),
+                "-l", "2"
+        };
+        try {
+            new XMindToLatexExporter().configure(args);
+            fail("ParseException expected");
+        }
+        catch (Exception e) {
+            assertTrue(e instanceof ParseException);
+        }
+    }
+    
+    @Test
+    public void testConfigureEnvFailMissingArgument() {
+        File in = new File("src/test/resources/content.xml");
+        String[] args = new String[] {
+                "-i", in.getPath(),
+                "-e", "2"
+        };
+        try {
+            new XMindToLatexExporter().configure(args);
+            fail("ParseException expected");
+        }
+        catch (Exception e) {
+            assertTrue(e instanceof ParseException);
+        }
+    }
+    
+    @Test
+    public void testConfigureInputFailMissingArgument() {
+        File in = new File("src/test/resources/content.xml");
+        String[] args = new String[] {
+                "-i", in.getPath(),
+                "-e", "2"
+        };
+        try {
+            new XMindToLatexExporter().configure(args);
+            fail("ParseException expected");
+        }
+        catch (Exception e) {
+            assertTrue(e instanceof ParseException);
+        }
+    }
+    
+    @Test
+    public void testConfigureOutputFailMissingArgument() {
+        File in = new File("src/test/resources/content.xml");
+        String[] args = new String[] {
+                "-i", in.getPath(),
+                "-o"
+        };
+        try {
+            new XMindToLatexExporter().configure(args);
+            fail("ParseException expected");
+        }
+        catch (Exception e) {
+            assertTrue(e instanceof ParseException);
+        }
+    }
+    
+    @Test
+    public void testConfigureTemplateLevelFailMissingArgument() {
+        File in = new File("src/test/resources/content.xml");
+        String[] args = new String[] {
+                "-i", in.getPath(),
+                "-" + TEMPLATE_LEVEL
         };
         try {
             new XMindToLatexExporter().configure(args);

@@ -92,6 +92,7 @@ In templates, the following variables are available:
 ### 1.2.0
 * UTF-8 output encoding (issue [#10](https://github.com/arnehaber/xmind2latex/issues/10)).
 * Escape line breaks in printed latex comments (issue [#8](https://github.com/arnehaber/xmind2latex/issues/8)).
+* Adds check for missing parameter arguments (issue [#7](https://github.com/arnehaber/xmind2latex/issues/7)).
 
 ### 1.1.0
 * Read xml as well as XMind source files using an input stream to omit extraction of XMind files (issue [#2](https://github.com/arnehaber/xmind2latex/issues/2)). 

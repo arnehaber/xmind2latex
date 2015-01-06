@@ -19,6 +19,15 @@
  */
 package de.haber.xmind2latex.help;
 
+import java.util.Map;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
+import com.google.common.collect.Maps;
+
 /**
  * Contains parameter constants.
  *
@@ -52,4 +61,31 @@ public class Parameters {
     
     public static final char TEMPLATE_LEVEL = 't';
     
+    /**
+     * Contains the valid number of arguments for parameters with arguments.
+     */
+    private static final Map<Character, Integer> param2arguments = Maps.newHashMap();
+    
+    static {
+      param2arguments.put(ENVIRONMENT, 3);
+      param2arguments.put(LEVEL, 2);
+    }
+    
+    /**
+     * Helper method that throws a {@link ParseException} if parameter arguments are missing.
+     * 
+     * @param cmd the concrete {@link CommandLine}
+     * @param param name of the parameter that is to be validated
+     * @param opts configured {@link Options}
+     * @throws ParseException if the number of arguments does not correspond to the expected number of arguments for the given parameter
+     */
+    public static void validateNumberOfArguments(CommandLine cmd, char param, Options opts) throws ParseException {
+        Integer numberOfArgs = param2arguments.get(param);
+        String[] tmp = cmd.getOptionValues(param);
+        if (numberOfArgs != null && tmp != null && tmp.length % numberOfArgs != 0) {
+            Option o = opts.getOption(Character.toString(param));
+            String name = o.getLongOpt() != null ? o.getLongOpt() : Character.toString(param);
+            throw new ParseException("Invalid amount of arguments for parameter " + name + ": <" + o.getArgName() + ">. Description: " + o.getDescription());
+        }
+    }
 }

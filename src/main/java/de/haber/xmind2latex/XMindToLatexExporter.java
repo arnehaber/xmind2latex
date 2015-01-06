@@ -62,6 +62,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import de.haber.xmind2latex.help.Parameters;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -142,7 +143,10 @@ public class XMindToLatexExporter {
      */
     public void configure(String[] args) throws ParseException {
         CommandLineParser parser = new BasicParser();
-        CommandLine cmd = parser.parse(options, args);
+        CommandLine cmd = parser.parse(options, args, false);
+        
+        Parameters.validateNumberOfArguments(cmd, INPUT, options);
+        
         File in = new File(cmd.getOptionValue(INPUT));
         try {
             setxMindSourceInputStream(in);
@@ -153,11 +157,13 @@ public class XMindToLatexExporter {
             throw e1;
         }
         if (cmd.hasOption(FORCE)) {
+            Parameters.validateNumberOfArguments(cmd, FORCE, options);
             this.setOverwriteExistingFile(true);
         }
         
         File out;
         if (cmd.hasOption(OUTPUT)) {
+            Parameters.validateNumberOfArguments(cmd, OUTPUT, options);
             out = new File(cmd.getOptionValue(OUTPUT));
         }
         else {            
@@ -167,6 +173,8 @@ public class XMindToLatexExporter {
         this.setTargetFile(out);
 
         if (cmd.hasOption(TEMPLATE_LEVEL)) {
+            Parameters.validateNumberOfArguments(cmd, TEMPLATE_LEVEL, options);
+            
             String level = cmd.getOptionValue(TEMPLATE_LEVEL);
             try {
                 int levelAsInt = Integer.parseInt(level);
@@ -183,10 +191,14 @@ public class XMindToLatexExporter {
             
         }
         if (cmd.hasOption(HELP)) {
+            Parameters.validateNumberOfArguments(cmd, HELP, options);
+          
             showHelp();
         }
         
         if (cmd.hasOption(ENVIRONMENT)) {
+            Parameters.validateNumberOfArguments(cmd, ENVIRONMENT, options);
+            
             String[] env = cmd.getOptionValues(ENVIRONMENT);
             for (int i = 0; i + 2 < env.length; i = i + 3) {
                 String level = env[i];
@@ -204,7 +216,10 @@ public class XMindToLatexExporter {
             }
         }
         if (cmd.hasOption(LEVEL)) {
+            Parameters.validateNumberOfArguments(cmd, LEVEL, options);
+            
             String[] tmp = cmd.getOptionValues(LEVEL);
+
             for (int i = 0; i + 1 < tmp.length; i = i + 2) {
                 String level = tmp[i];
                 String template = tmp[i + 1];

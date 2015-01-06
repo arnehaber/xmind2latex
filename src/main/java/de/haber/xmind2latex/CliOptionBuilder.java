@@ -59,6 +59,7 @@ class CliOptionBuilder {
      */
     protected static Options getOptions() {
         Options o = new Options();
+        
         o.addOption(OptionBuilder.withArgName("input file")
                                 .withLongOpt("input")
                                 .withDescription("Required input file name.")
@@ -102,6 +103,7 @@ class CliOptionBuilder {
                                  .create(ENVIRONMENT));
         o.addOption(OptionBuilder.withArgName("level> <template")
                                  .withLongOpt("level-template")
+                                 .withValueSeparator(' ')
                                  .withDescription("Sets the template that is to be used for the given level (optional). " +
                                          "Templates must be either loadable from the classpath with the given full qualified name (no file extension, " +
                                          "directories separated by a '.', or as a file (with '.ftl' extension, directories separated by a path separator).")
