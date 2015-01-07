@@ -21,6 +21,8 @@ package de.haber.xmind2latex;
 
 import org.apache.commons.cli.ParseException;
 
+import de.haber.xmind2latex.cli.CliParameters;
+
 /**
  * Main class to execute a {@link XMindToLatexExporter}.
  *
@@ -48,14 +50,13 @@ public class Main {
 	 * @param args configuration arguments.
 	 */
     public static void main(String[] args) {
-        XMindToLatexExporter tool = new XMindToLatexExporter();
         try {
-            tool.configure(args);
+            XMindToLatexExporter tool = CliParameters.build(args);
             tool.convert();
         }
         catch (ParseException e) {
             System.err.println(e.getMessage());
-            tool.showHelp();
+            CliParameters.showHelp();
             System.exit(-1);
         } 
         catch (Exception e) {

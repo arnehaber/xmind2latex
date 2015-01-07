@@ -91,6 +91,7 @@ In templates, the following variables are available:
 ## Version History
 ### 1.2.0
 * UTF-8 output encoding (issue [#10](https://github.com/arnehaber/xmind2latex/issues/10)).
+* Adds a builder to configure the exporter (issue [#9](https://github.com/arnehaber/xmind2latex/issues/9)).
 * Escape line breaks in printed latex comments (issue [#8](https://github.com/arnehaber/xmind2latex/issues/8)).
 * Adds check for missing parameter arguments (issue [#7](https://github.com/arnehaber/xmind2latex/issues/7)).
 
@@ -103,7 +104,6 @@ In templates, the following variables are available:
 
 ### 1.0.0 
 * initial release
-
 
 ## License
 

@@ -20,7 +20,11 @@
 package de.haber.xmind2latex;
 
 import static de.haber.xmind2latex.XMindToLatexExporter.TEMPLATE_PACKAGE;
-import static de.haber.xmind2latex.help.Parameters.*;
+import static de.haber.xmind2latex.cli.CliParameters.FORCE;
+import static de.haber.xmind2latex.cli.CliParameters.INPUT;
+import static de.haber.xmind2latex.cli.CliParameters.LEVEL;
+import static de.haber.xmind2latex.cli.CliParameters.OUTPUT;
+import static de.haber.xmind2latex.cli.CliParameters.TEMPLATE_LEVEL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -30,13 +34,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.google.common.io.Files;
+
+import de.haber.xmind2latex.cli.CliParameters;
 
 /**
  * Execution tests for the {@link XMindToLatexExporter}.
@@ -62,17 +66,6 @@ public class XMindToLatexExporterExecutionTest {
     }
     
     @Test
-    public void testExceptionWhenConvertingWithUnconfiguredTool() {
-        try {
-            new XMindToLatexExporter().convert();
-            fail("ParserConfigurationException expected");
-        }
-        catch (Exception e) {
-            assertTrue(e instanceof ParserConfigurationException);
-        }
-    }
-    
-    @Test
     public void testExecute() {
         File in = new File("src/test/resources/content.xml");
         File out = new File("target/testout/result.tex");
@@ -85,8 +78,7 @@ public class XMindToLatexExporterExecutionTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             assertFalse(out.exists());
             exporter.convert();
             assertTrue(out.exists());
@@ -110,8 +102,7 @@ public class XMindToLatexExporterExecutionTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             assertTrue(out.exists());
             exporter.convert();
             fail("Expected fail");
@@ -141,8 +132,7 @@ public class XMindToLatexExporterExecutionTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             assertTrue(out.exists());
             // old and out do not differ
             assertTrue(Files.equal(out, old));
@@ -173,8 +163,7 @@ public class XMindToLatexExporterExecutionTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             exporter.convert();
             assertTrue(out.exists());
             String content = FileUtils.readFileToString(out);
@@ -203,8 +192,7 @@ public class XMindToLatexExporterExecutionTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             exporter.convert();
             assertTrue(out.exists());
         }
@@ -224,10 +212,9 @@ public class XMindToLatexExporterExecutionTest {
                 "-i", in.getAbsolutePath(),
                 "-o", out.getAbsolutePath()
         };
-        XMindToLatexExporter exporter = new XMindToLatexExporter();
+        XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             assertFalse(out.exists());
             exporter.convert();
             assertTrue(out.exists());
@@ -249,8 +236,7 @@ public class XMindToLatexExporterExecutionTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             exporter.convert();
             assertTrue(out.exists());
             String content = FileUtils.readFileToString(out);
@@ -276,8 +262,7 @@ public class XMindToLatexExporterExecutionTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             assertEquals(5, exporter.getTemplates().size());
             assertEquals(expectedTemplate, exporter.getTemplates().get(2));
             exporter.convert();
@@ -303,8 +288,7 @@ public class XMindToLatexExporterExecutionTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             exporter.convert();
         }
         catch (Exception e) {
@@ -327,8 +311,7 @@ public class XMindToLatexExporterExecutionTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             exporter.convert();
         }
         catch (Exception e) {
@@ -349,8 +332,7 @@ public class XMindToLatexExporterExecutionTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             exporter.convert();
             assertTrue(out.exists());
             String content = FileUtils.readFileToString(out);
@@ -377,8 +359,7 @@ public class XMindToLatexExporterExecutionTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             exporter.convert();
             assertTrue(out.exists());
             String content = FileUtils.readFileToString(out);
@@ -402,8 +383,7 @@ public class XMindToLatexExporterExecutionTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             exporter.convert();
             assertTrue(out.exists());
             String content = FileUtils.readFileToString(out);
@@ -432,8 +412,7 @@ public class XMindToLatexExporterExecutionTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             exporter.convert();
             assertTrue(out.exists());
             String content = FileUtils.readFileToString(out);

@@ -17,20 +17,21 @@
  * limitations under the License.
  * #L%
  */
-package de.haber.xmind2latex;
+package de.haber.xmind2latex.cli;
 
-import static de.haber.xmind2latex.help.Parameters.ENVIRONMENT;
-import static de.haber.xmind2latex.help.Parameters.FORCE;
-import static de.haber.xmind2latex.help.Parameters.HELP;
-import static de.haber.xmind2latex.help.Parameters.INPUT;
-import static de.haber.xmind2latex.help.Parameters.LEVEL;
-import static de.haber.xmind2latex.help.Parameters.OUTPUT;
-import static de.haber.xmind2latex.help.Parameters.TEMPLATE_LEVEL;
+import static de.haber.xmind2latex.cli.CliParameters.ENVIRONMENT;
+import static de.haber.xmind2latex.cli.CliParameters.FORCE;
+import static de.haber.xmind2latex.cli.CliParameters.HELP;
+import static de.haber.xmind2latex.cli.CliParameters.INPUT;
+import static de.haber.xmind2latex.cli.CliParameters.LEVEL;
+import static de.haber.xmind2latex.cli.CliParameters.OUTPUT;
+import static de.haber.xmind2latex.cli.CliParameters.TEMPLATE_LEVEL;
 
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PatternOptionBuilder;
 
+import de.haber.xmind2latex.XMindToLatexExporter;
 import de.haber.xmind2latex.help.CoverageIgnore;
 
 /**

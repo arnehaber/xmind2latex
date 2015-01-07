@@ -19,13 +19,8 @@
  */
 package de.haber.xmind2latex;
 
-import static de.haber.xmind2latex.help.Parameters.ENVIRONMENT;
-import static de.haber.xmind2latex.help.Parameters.FORCE;
-import static de.haber.xmind2latex.help.Parameters.HELP;
-import static de.haber.xmind2latex.help.Parameters.INPUT;
-import static de.haber.xmind2latex.help.Parameters.LEVEL;
-import static de.haber.xmind2latex.help.Parameters.OUTPUT;
-import static de.haber.xmind2latex.help.Parameters.TEMPLATE_LEVEL;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,12 +41,6 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
 
-import org.apache.commons.cli.BasicParser;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -59,10 +48,13 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import de.haber.xmind2latex.help.Parameters;
+import de.haber.xmind2latex.cli.CliParameters;
+import de.haber.xmind2latex.help.ConfigurationException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -78,170 +70,229 @@ import freemarker.template.Template;
  */
 public class XMindToLatexExporter {
         
+    /**
+     * {@link XMindToLatexExporter} {@link Builder}.
+     * 
+     * @since 1.2.0
+     */
+    public static class Builder {
+        // required fields
+        private final File in;
+        
+        private Map<Integer, String> level2endTemplate = Maps.newHashMap();
+        private Map<Integer, String> level2startTemplate = Maps.newHashMap();
+        private int maxLevel = -1;
+        // optional fields - initialized to default values
+        private boolean overwriteExistingFile = false;
+        // optional fields - defaults initialized in constructor
+        private File targetFile;
+        
+        private List<String> templates = Lists.newArrayList(
+                        TEMPLATE_PACKAGE + "undefined",
+                        TEMPLATE_PACKAGE + "chapter",
+                        TEMPLATE_PACKAGE + "section",
+                        TEMPLATE_PACKAGE + "subsection",
+                        TEMPLATE_PACKAGE + "subsubsection");
+        
+        /**
+         * Creates a new {@link XMindToLatexExporter} builder for the given input file.
+         * 
+         * @param in input file, must not be null and has to exist
+         */
+        public Builder(File in) {
+            checkNotNull(in);
+            checkArgument(in.exists(), "Input file has to exist!");
+            this.in = in;
+            
+            String outDerived = in.getAbsolutePath().concat(".tex");
+            targetFile = new File(outDerived);
+        }
+        
+        /**
+         * 
+         * @return a configured {@link XMindToLatexExporter}.
+         * 
+         * @throws ConfigurationException for invalid input files.
+         */
+        public XMindToLatexExporter build() {
+          return new XMindToLatexExporter(this);
+        }
+        
+        /***
+         * @param overwriteExistingFile true, if existing files shall be overridden.
+         * 
+         * @return the builder.
+         */
+        public Builder overwritesExistingFiles(boolean overwriteExistingFile) {
+            this.overwriteExistingFile = overwriteExistingFile;
+            return this;
+        }
+        
+        /**
+         * Sets environment start and end templates for the given level.
+         * 
+         * @param level level to configure, has to be >= 0
+         * @param startTemplate environment start template to use, must not be null and has to exist
+         * @param endTemplate environment end template to use, must not be null and has to exist
+         * 
+         * @return the used builder
+         */
+        public Builder withEnvironmentTemplates(int level, String startTemplate, String endTemplate) {
+            checkArgument(level >= 0);
+            validateTemplate(startTemplate);
+            validateTemplate(endTemplate);
+            if (level2startTemplate.containsKey(level)) {
+                throw new ConfigurationException("Level " + level + " is already configured to use environment templates " + 
+                                level2startTemplate.get(level) + " " + level2endTemplate.get(level));
+            }
+            this.level2startTemplate.put(level, startTemplate);
+            this.level2endTemplate.put(level, endTemplate);
+            return this;
+        }
+        
+        private void validateTemplate(String template) {
+            checkNotNull(template);
+            try {
+                XMindToLatexExporter.templateConfig.getTemplate(template);
+            }
+            catch (IOException e) {
+                TemplateNotExistsException ce = new TemplateNotExistsException(template);
+                ce.addSuppressed(e);
+                throw ce;
+            }
+        }
+
+        /**
+         * Sets the maximal level used for template processing. 
+         * -1 corresponds to 'process all available templates'.
+         * 
+         * @param level the maximal level to set, must be >= -1
+
+         * @return the used builder
+         */
+        public Builder withMaxLevel(int level) {
+            checkArgument(level >= -1);
+            this.maxLevel = level;
+            return this;
+        }
+        
+        /**
+         * 
+         * @param targetFile the target file, must not be null.
+         * @return the used builder
+         */
+        public Builder withTargetFile(File targetFile) {
+            checkNotNull(targetFile);
+            this.targetFile = targetFile;
+            return this;
+        }
+        
+        /**
+         * Sets the template for a specific level.
+         * 
+         * @param level level to set the template for, has to be >= 0
+         * @param template template for the given level, must not be null and has to exist
+         * @return the used builder
+         */
+        public Builder withTemplate(int level, String template) {
+            checkArgument(level >= 0);
+            validateTemplate(template);
+            // warn, if added templates will not be used, because max level is set
+            if (maxLevel != -1 && level > maxLevel) {
+                throw new ConfigurationException("The added template for level " 
+                        + level + 
+                        " will not be used because max template level has been configured to level " 
+                        + maxLevel);
+            }
+            
+            int prevSize = templates.size();
+            
+            if (level >= 0 && level < prevSize) {
+                templates.set(level, template);
+            }
+            else if (level == prevSize) {
+                templates.add(template);
+            }
+            // fill with default templates, if larger
+            else {
+                for (int i = 0; i < level - prevSize; i++) {
+                    templates.add(templates.get(0));
+                }
+                templates.add(template);
+            }
+            return this;
+        }
+    }
+    
     /** Used as indention. */
     public static final String INDENT = "  ";
-    
     public static final String NEW_LINE = "\n";
-    public static final String TEMPLATE_PACKAGE = "de.haber.xmind2latex.templates.";
     
+    public static final String TEMPLATE_PACKAGE = "de.haber.xmind2latex.templates.";
     public static final String TEXT = "#text";
+    
     public static final String TITLE = "title";
     
     public static final String TOPIC = "topic";
     
     private int depthCounter = 0;
-    private Map<Integer, String> level2endTemplate = Maps.newHashMap();
     
+    private final Map<Integer, String> level2endTemplate;
     /**
      * Stores indent strings for a specific level.
      */
-    private final Map<Integer, String> level2indent;
+    private final Map<Integer, String> level2indent = Maps.newHashMap();
+    private final Map<Integer, String> level2startTemplate;
     
-    private Map<Integer, String> level2startTemplate = Maps.newHashMap();
     /**
      * The maximal level used for template processing. -1 corresponds to
      * 'process all available templates'.
      */
-    private int maxLevel = -1;
+    private final int maxLevel;
     
-    private final Options options;
-    
-    private boolean overwriteExistingFile = false;
+    private final boolean overwriteExistingFile;
     
     /**
      * Target file.
      */
-    private File targetFile;
+    private final File targetFile;
     
-    private final Configuration templateConfig;
+    private static final Configuration templateConfig;
     
-    private List<String> templates = Lists.newArrayList(
-            TEMPLATE_PACKAGE + "undefined",
-            TEMPLATE_PACKAGE + "chapter",
-            TEMPLATE_PACKAGE + "section",
-            TEMPLATE_PACKAGE + "subsection",
-            TEMPLATE_PACKAGE + "subsubsection"
-    );
+    static {
+        templateConfig = new Configuration();
+        templateConfig.setClassForTemplateLoading(XMindToLatexExporter.class, "");
+        templateConfig.setTemplateLoader(new XMindTemplateLoader(XMindToLatexExporter.class.getClassLoader()));
+        templateConfig.setLocalizedLookup(false);
+    }
 
-    private InputStream xMindSourceStream;
+    private final List<String> templates;
+    
+    private final InputStream xMindSourceStream;
     
     /**
      * Creates a new {@link XMindToLatexExporter}.
+     * 
+     * @throws ConfigurationException for invalid input files
      */
-    public XMindToLatexExporter() {
-        options = CliOptionBuilder.getOptions();
-        templateConfig = new Configuration();
-        templateConfig.setClassForTemplateLoading(getClass(), "");
-        templateConfig.setTemplateLoader(new XMindTemplateLoader(getClass().getClassLoader()));
-        templateConfig.setLocalizedLookup(false);
-        level2indent = new HashMap<Integer, String>();
-    }
-    
-    /**
-     * @param args Arguments to configure this {@link XMindToLatexExporter}.
-     * @throws ParseException for invalid arguments
-     */
-    public void configure(String[] args) throws ParseException {
-        CommandLineParser parser = new BasicParser();
-        CommandLine cmd = parser.parse(options, args, false);
+    private XMindToLatexExporter(Builder builder) {
+
         
-        Parameters.validateNumberOfArguments(cmd, INPUT, options);
-        
-        File in = new File(cmd.getOptionValue(INPUT));
         try {
-            setxMindSourceInputStream(in);
+            xMindSourceStream = setxMindSourceInputStream(builder.in);
         }
         catch (Exception e) {
-            ParseException e1 = new ParseException(e.getMessage());
+            ConfigurationException e1 = new ConfigurationException(e.getMessage());
             e1.addSuppressed(e);
             throw e1;
         }
-        if (cmd.hasOption(FORCE)) {
-            Parameters.validateNumberOfArguments(cmd, FORCE, options);
-            this.setOverwriteExistingFile(true);
-        }
-        
-        File out;
-        if (cmd.hasOption(OUTPUT)) {
-            Parameters.validateNumberOfArguments(cmd, OUTPUT, options);
-            out = new File(cmd.getOptionValue(OUTPUT));
-        }
-        else {            
-            String outDerived = in.getAbsolutePath().concat(".tex");
-            out = new File(outDerived);
-        }
-        this.setTargetFile(out);
 
-        if (cmd.hasOption(TEMPLATE_LEVEL)) {
-            Parameters.validateNumberOfArguments(cmd, TEMPLATE_LEVEL, options);
-            
-            String level = cmd.getOptionValue(TEMPLATE_LEVEL);
-            try {
-                int levelAsInt = Integer.parseInt(level);
-                if (levelAsInt < 0) {
-                    throw new NumberFormatException();
-                }
-                setMaxLevel(levelAsInt);
-            }
-            catch (NumberFormatException e) {
-                ParseException ex = new ParseException("The level argument of option " + TEMPLATE_LEVEL + " has to be a positive integer.");
-                ex.addSuppressed(e);
-                throw ex;
-            }
-            
-        }
-        if (cmd.hasOption(HELP)) {
-            Parameters.validateNumberOfArguments(cmd, HELP, options);
-          
-            showHelp();
-        }
-        
-        if (cmd.hasOption(ENVIRONMENT)) {
-            Parameters.validateNumberOfArguments(cmd, ENVIRONMENT, options);
-            
-            String[] env = cmd.getOptionValues(ENVIRONMENT);
-            for (int i = 0; i + 2 < env.length; i = i + 3) {
-                String level = env[i];
-                String start = env[i + 1];
-                String end = env[i + 2];
-                try {
-                    int levelAsInt = Integer.parseInt(level);      
-                    setEnvironmentTemplates(levelAsInt, start, end);
-                }
-                catch (NumberFormatException e) {
-                    ParseException ex = new ParseException("The level argument of option " + ENVIRONMENT + " has to be an integer.");
-                    ex.addSuppressed(e);
-                    throw ex;
-                }
-            }
-        }
-        if (cmd.hasOption(LEVEL)) {
-            Parameters.validateNumberOfArguments(cmd, LEVEL, options);
-            
-            String[] tmp = cmd.getOptionValues(LEVEL);
-
-            for (int i = 0; i + 1 < tmp.length; i = i + 2) {
-                String level = tmp[i];
-                String template = tmp[i + 1];
-                try {
-                    int levelAsInt = Integer.parseInt(level);      
-                    setLevelTemplate(levelAsInt, template);
-                    // warn, if added templates will not be used, because max level is set
-                    int maxLvl = getMaxLevel();
-                    if (maxLvl != -1 && levelAsInt > maxLvl) {
-                        throw new ParseException("The added template for level " 
-                                + levelAsInt + 
-                                " will not be used because max template level has been configured to level " 
-                                + maxLvl);
-                    }
-                }
-                catch (NumberFormatException e) {
-                    ParseException ex = new ParseException("The level argument of option " + LEVEL + " has to be an integer.");
-                    ex.addSuppressed(e);
-                    throw ex;
-                }
-            }
-        }
+        targetFile = builder.targetFile;
+        overwriteExistingFile = builder.overwriteExistingFile;
+        templates = ImmutableList.copyOf(builder.templates);
+        maxLevel = builder.maxLevel;
+        this.level2startTemplate = ImmutableMap.copyOf(builder.level2startTemplate);
+        this.level2endTemplate = ImmutableMap.copyOf(builder.level2endTemplate);
     }
     
     public void convert() throws ParserConfigurationException, SAXException, IOException {
@@ -429,55 +480,11 @@ public class XMindToLatexExporter {
             pw.close();
         }
         else {
-            throw new FileAlreadyExistsException(tf.getAbsolutePath(), "", "If you want to overwrite existing files use param " + options.getOption("f").getOpt());
+            throw new FileAlreadyExistsException(tf.getAbsolutePath(), "", "If you want to overwrite existing files use param " + CliParameters.FORCE);
         }
     }
-    
-    public void setEnvironmentTemplates(int level, String startTemplate, String endTemplate) {
-        level2startTemplate.put(level, startTemplate);
-        level2endTemplate.put(level, endTemplate);
-    }
-    
-    public void setLevelTemplate(int level, String template) {
-        int prevSize = templates.size();
-        
-        if (level >= 0 && level < prevSize) {
-            templates.set(level, template);
-        }
-        else if (level == prevSize) {
-            templates.add(template);
-        }
-        // fill with default templates, if larger
-        else {
-            for (int i = 0; i < level - prevSize; i++) {
-                templates.add(templates.get(0));
-            }
-            templates.add(template);
-        }
-    }
-    
-    /**
-     * Sets the maximal level used for template processing. -1 corresponds to
-     * 'process all available templates'.
-     * @param maxLevel the maximal level to set
-     */
-    public void setMaxLevel(int maxLevel) {
-        this.maxLevel = maxLevel;
-    }
-    
-    /**
-     * @param overwriteExistingFile the overwriteExistingFile to set
-     */
-    public void setOverwriteExistingFile(boolean overwriteExistingFile) {
-        this.overwriteExistingFile = overwriteExistingFile;
-    }
-    
-    /**
-     * @param targetFile the targetFile to set
-     */
-    public void setTargetFile(File targetFile) {
-        this.targetFile = targetFile;
-    }
+   
+   
 
     /**
      * @param xMindSource the xMindSource to set, must not be null
@@ -485,7 +492,7 @@ public class XMindToLatexExporter {
      * @throws ZipException if a given XMind file may not be extracted.
      * @throws IOException 
      */
-    public void setxMindSourceInputStream(File xMindSource) throws ZipException, IOException {
+    private InputStream setxMindSourceInputStream(File xMindSource) throws ZipException, IOException {
         Preconditions.checkNotNull(xMindSource);
         File usedFile = xMindSource;
         if (!usedFile.exists()) {
@@ -494,18 +501,10 @@ public class XMindToLatexExporter {
         if (usedFile.getName().endsWith(".xmind")) {
             ZipFile zip = new ZipFile(usedFile);
             FileHeader fh = zip.getFileHeader("content.xml");
-            xMindSourceStream = zip.getInputStream(fh);
+            return zip.getInputStream(fh);
         }
         else {
-            xMindSourceStream = FileUtils.openInputStream(usedFile);
+            return FileUtils.openInputStream(usedFile);
         }
-    }
-
-    /**
-     * 
-     */
-    protected void showHelp() {
-        HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("xmind2latex", this.options);
     }
 }

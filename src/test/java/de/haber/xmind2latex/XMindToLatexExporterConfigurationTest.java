@@ -20,7 +20,9 @@
 package de.haber.xmind2latex;
 
 import static de.haber.xmind2latex.XMindToLatexExporter.TEMPLATE_PACKAGE;
-import static de.haber.xmind2latex.help.Parameters.*;
+import static de.haber.xmind2latex.cli.CliParameters.INPUT;
+import static de.haber.xmind2latex.cli.CliParameters.LEVEL;
+import static de.haber.xmind2latex.cli.CliParameters.TEMPLATE_LEVEL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -37,6 +39,10 @@ import net.lingala.zip4j.io.ZipInputStream;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
+
+import de.haber.xmind2latex.XMindToLatexExporter.Builder;
+import de.haber.xmind2latex.cli.CliParameters;
+import de.haber.xmind2latex.help.ConfigurationException;
 
 /**
  * Configuration tests for the {@link XMindToLatexExporter}. <br>
@@ -65,8 +71,7 @@ public class XMindToLatexExporterConfigurationTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             assertEquals("\\begin{enumerate}\n", exporter.getStartEnvironment(5));
             assertEquals("\\end{enumerate}\n", exporter.getEndEnvironment(5));
             assertEquals("\\begin{itemize}\n", exporter.getStartEnvironment(6));
@@ -93,10 +98,8 @@ public class XMindToLatexExporterConfigurationTest {
                 "-e", "thisShouldBeAnInteger", expectedStart5, expectedEnd5,
                 "-e", "6", expectedStart6, expectedEnd6,
         };
-        XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            CliParameters.build(args);
             fail("ParseException expected.");
         }
         catch (Exception e) {
@@ -117,8 +120,7 @@ public class XMindToLatexExporterConfigurationTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             
             assertEquals(expectedOut, exporter.getTargetFile().getAbsolutePath());
             assertTrue(exporter.isOverwriteExistingFile());
@@ -141,8 +143,7 @@ public class XMindToLatexExporterConfigurationTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             
             assertEquals(expectedOut, exporter.getTargetFile().getAbsolutePath());
             assertTrue(exporter.isOverwriteExistingFile());
@@ -163,8 +164,8 @@ public class XMindToLatexExporterConfigurationTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
+            
             assertEquals(5, exporter.getTemplates().size());
             assertEquals(expectedTemplate, exporter.getTemplates().get(2));
         }
@@ -183,14 +184,13 @@ public class XMindToLatexExporterConfigurationTest {
                 "-" + LEVEL, "3", expectedTemplate,
                 "-" + TEMPLATE_LEVEL, "2"
         };
-        XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
-            fail("ParseException expected");
+            CliParameters.build(args);
+            
+            fail("ConfigurationException expected");
         }
         catch (Exception e) {
-            assertTrue(e instanceof ParseException);
+            assertTrue(e instanceof ConfigurationException);
         }
     }
     
@@ -206,8 +206,8 @@ public class XMindToLatexExporterConfigurationTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
+            
             assertEquals(5, exporter.getTemplates().size());
             assertEquals(expectedTemplate, exporter.getTemplates().get(2));
             assertEquals(2, exporter.getMaxLevel());
@@ -227,8 +227,8 @@ public class XMindToLatexExporterConfigurationTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
+            
             assertEquals(2, exporter.getMaxLevel());
         }
         catch (ParseException e) {
@@ -244,10 +244,8 @@ public class XMindToLatexExporterConfigurationTest {
                 "-" + INPUT, in.getPath(),
                 "-" + TEMPLATE_LEVEL, "-2"
         };
-        XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            CliParameters.build(args);
             fail("ParseException expected due to negative max level.");
         }
         catch (Exception e) {
@@ -264,8 +262,8 @@ public class XMindToLatexExporterConfigurationTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
+            
             assertEquals(-1, exporter.getMaxLevel());
         }
         catch (ParseException e) {
@@ -284,8 +282,8 @@ public class XMindToLatexExporterConfigurationTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
+            
             assertEquals(11, exporter.getTemplates().size());
             assertEquals(expectedTemplate, exporter.getTemplates().get(10));
         }
@@ -302,7 +300,7 @@ public class XMindToLatexExporterConfigurationTest {
                 "-l", "Hallo", "foo"
         };
         try {
-            new XMindToLatexExporter().configure(args);
+            CliParameters.build(args);
             fail("ParseException expected");
         }
         catch (Exception e) {
@@ -318,7 +316,7 @@ public class XMindToLatexExporterConfigurationTest {
                 "-l", "2"
         };
         try {
-            new XMindToLatexExporter().configure(args);
+            CliParameters.build(args);
             fail("ParseException expected");
         }
         catch (Exception e) {
@@ -334,7 +332,7 @@ public class XMindToLatexExporterConfigurationTest {
                 "-e", "2"
         };
         try {
-            new XMindToLatexExporter().configure(args);
+            CliParameters.build(args);
             fail("ParseException expected");
         }
         catch (Exception e) {
@@ -350,7 +348,7 @@ public class XMindToLatexExporterConfigurationTest {
                 "-e", "2"
         };
         try {
-            new XMindToLatexExporter().configure(args);
+            CliParameters.build(args);
             fail("ParseException expected");
         }
         catch (Exception e) {
@@ -366,7 +364,7 @@ public class XMindToLatexExporterConfigurationTest {
                 "-o"
         };
         try {
-            new XMindToLatexExporter().configure(args);
+            CliParameters.build(args);
             fail("ParseException expected");
         }
         catch (Exception e) {
@@ -382,7 +380,7 @@ public class XMindToLatexExporterConfigurationTest {
                 "-" + TEMPLATE_LEVEL
         };
         try {
-            new XMindToLatexExporter().configure(args);
+            CliParameters.build(args);
             fail("ParseException expected");
         }
         catch (Exception e) {
@@ -401,8 +399,7 @@ public class XMindToLatexExporterConfigurationTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             assertEquals(6, exporter.getTemplates().size());
             assertEquals(expectedTemplate, exporter.getTemplates().get(5));
         }
@@ -422,8 +419,7 @@ public class XMindToLatexExporterConfigurationTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             
             assertEquals(out.getAbsolutePath(), exporter.getTargetFile().getAbsolutePath());
             assertFalse(exporter.isOverwriteExistingFile());
@@ -444,8 +440,7 @@ public class XMindToLatexExporterConfigurationTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             
             assertEquals(out.getAbsolutePath(), exporter.getTargetFile().getAbsolutePath());
             assertFalse(exporter.isOverwriteExistingFile());
@@ -466,8 +461,8 @@ public class XMindToLatexExporterConfigurationTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
+            
             assertEquals(expectedOut, exporter.getTargetFile().getAbsolutePath());
             assertTrue(exporter.getxMindSourceAsStream() instanceof FileInputStream);
             FileInputStream fis = (FileInputStream) exporter.getxMindSourceAsStream();
@@ -486,14 +481,13 @@ public class XMindToLatexExporterConfigurationTest {
         String[] args = new String[] {
                 "-i", in.getPath()
         };
-        XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
-            fail("ParseException expected");
+            CliParameters.build(args);
+            
+            fail("IllegalArgumentException expected");
         }
         catch (Exception e) {
-            assertTrue(e instanceof ParseException);
+            assertTrue(e instanceof IllegalArgumentException);
         }
     }
     
@@ -504,14 +498,13 @@ public class XMindToLatexExporterConfigurationTest {
         String[] args = new String[] {
                 "-i", in.getPath()
         };
-        XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
-            fail("ParseException expected");
+            CliParameters.build(args);
+            
+            fail("ConfigurationException expected");
         }
         catch (Exception e) {
-            assertTrue(e instanceof ParseException);
+            assertTrue(e instanceof ConfigurationException);
         }
     }
     
@@ -525,8 +518,8 @@ public class XMindToLatexExporterConfigurationTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
+            
             assertEquals(expectedOut, exporter.getTargetFile().getAbsolutePath());
             FileInputStream fis = (FileInputStream) exporter.getxMindSourceAsStream();
             assertTrue(fis.getFD().valid());
@@ -546,9 +539,9 @@ public class XMindToLatexExporterConfigurationTest {
         String[] args = new String[] {
                 "-i", in.getPath()
         };
-        XMindToLatexExporter exporter = new XMindToLatexExporter();
+        XMindToLatexExporter exporter;
         try {
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             assertEquals(expectedOut, exporter.getTargetFile().getAbsolutePath());
             assertTrue(exporter.getxMindSourceAsStream().getClass().getName(), exporter.getxMindSourceAsStream() instanceof ZipInputStream);
             ZipInputStream fis = (ZipInputStream) exporter.getxMindSourceAsStream();
@@ -567,8 +560,7 @@ public class XMindToLatexExporterConfigurationTest {
     public void testEmptyConfigure() {
         String[] args = new String[] {};
         try {
-            XMindToLatexExporter exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            CliParameters.build(args);
             fail("ParseException expected");
         }
         catch (Exception e) {
@@ -588,15 +580,13 @@ public class XMindToLatexExporterConfigurationTest {
                 "-i", in.getPath(),
                 "-h"
         };
-        XMindToLatexExporter exporter;
         try {
             result.createNewFile();            
             FileOutputStream os = new FileOutputStream(result);
             PrintStream out = new PrintStream(os);
             PrintStream old_out = System.out;
             System.setOut(out);
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            CliParameters.build(args);
             String resultContent = FileUtils.readFileToString(result);
             assertFalse(resultContent.isEmpty());
             assertTrue(resultContent.contains("usage: xmind2latex"));
@@ -619,15 +609,14 @@ public class XMindToLatexExporterConfigurationTest {
                 "-i", in.getPath(),
                 "-help"
         };
-        XMindToLatexExporter exporter;
         try {
             result.createNewFile();            
             FileOutputStream os = new FileOutputStream(result);
             PrintStream out = new PrintStream(os);
             PrintStream old_out = System.out;
             System.setOut(out);
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            CliParameters.build(args);
+            
             String resultContent = FileUtils.readFileToString(result);
             assertFalse(resultContent.isEmpty());
             assertTrue(resultContent.contains("usage: xmind2latex"));
@@ -638,4 +627,119 @@ public class XMindToLatexExporterConfigurationTest {
             fail(e.getMessage());
         }
     }
+    
+    @Test
+    public void testBuilderWithTemplateExceptionNonExistingTemplate() {
+        File in = new File("src/test/resources/content.xml");
+        Builder builder = new Builder(in);
+        try {
+            builder.withTemplate(2, "doesnotexist");
+            fail("Expected " + TemplateNotExistsException.class.getName());
+        }
+        catch (Exception e) {
+            assertEquals(TemplateNotExistsException.class, e.getClass());
+        }
+    }
+    
+    @Test
+    public void testBuilderWithTemplateExceptionInvalidLevel() {
+        File in = new File("src/test/resources/content.xml");
+        Builder builder = new Builder(in);
+        try {
+            builder.withTemplate(-1, TEMPLATE_PACKAGE + "undefined");
+            fail("Expected " + IllegalArgumentException.class.getName());
+        }
+        catch (Exception e) {
+            assertEquals(IllegalArgumentException.class, e.getClass());
+        }
+    }
+    
+    @Test
+    public void testBuilderWithEnvironmentTemplatesExceptionNonExistingStartTemplate() {
+        File in = new File("src/test/resources/content.xml");
+        Builder builder = new Builder(in);
+        try {
+            builder.withEnvironmentTemplates(2, "doesnotexist", TEMPLATE_PACKAGE + "undefined");
+            fail("Expected " + TemplateNotExistsException.class.getName());
+        }
+        catch (Exception e) {
+            assertEquals(TemplateNotExistsException.class, e.getClass());
+        }
+    }
+    
+    @Test
+    public void testBuilderWithEnvironmentTemplatesExceptionNonExistingEndTemplate() {
+        File in = new File("src/test/resources/content.xml");
+        Builder builder = new Builder(in);
+        try {
+            builder.withEnvironmentTemplates(2, TEMPLATE_PACKAGE + "undefined", "doesnotexist");
+            fail("Expected " + TemplateNotExistsException.class.getName());
+        }
+        catch (Exception e) {
+            assertEquals(TemplateNotExistsException.class, e.getClass());
+        }
+    }
+    
+    @Test
+    public void testBuilderWithEnvironmentTemplatesExceptionInvalidLevel() {
+        File in = new File("src/test/resources/content.xml");
+        Builder builder = new Builder(in);
+        try {
+            builder.withEnvironmentTemplates(-1, TEMPLATE_PACKAGE + "undefined", TEMPLATE_PACKAGE + "undefined");
+            fail("Expected " + IllegalArgumentException.class.getName());
+        }
+        catch (Exception e) {
+            assertEquals(IllegalArgumentException.class, e.getClass());
+        }
+    }
+    
+    @Test
+    public void testBuilderConstructorNotExistingInputException() {
+        File in = new File("doesnotexist.xml");
+        try {
+            new Builder(in);
+            fail("Expected " + IllegalArgumentException.class.getName());
+        }
+        catch (Exception e) {
+            assertEquals(IllegalArgumentException.class, e.getClass());
+        }
+    }
+    
+    @Test
+    public void testBuilderConstructorNullInputException() {
+        try {
+            new Builder(null);
+            fail("Expected " + NullPointerException.class.getName());
+        }
+        catch (Exception e) {
+            assertEquals(NullPointerException.class, e.getClass());
+        }
+    }
+    
+    @Test
+    public void testBuilderWithTargetFileNullOutputException() {
+        File in = new File("src/test/resources/content.xml");
+        Builder builder = new Builder(in);
+        try {
+            builder.withTargetFile(null);
+            fail("Expected " + NullPointerException.class.getName());
+        }
+        catch (Exception e) {
+            assertEquals(NullPointerException.class, e.getClass());
+        }
+    }
+    
+    @Test
+    public void testBuilderWithMaxLevelException() {
+        File in = new File("src/test/resources/content.xml");
+        Builder builder = new Builder(in);
+        try {
+            builder.withMaxLevel(-2);
+            fail("Expected " + IllegalArgumentException.class.getName());
+        }
+        catch (Exception e) {
+            assertEquals(IllegalArgumentException.class, e.getClass());
+        }
+    }
+    
 }

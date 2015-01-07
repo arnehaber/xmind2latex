@@ -34,6 +34,8 @@ import java.lang.reflect.Method;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
+import de.haber.xmind2latex.cli.CliParameters;
+
 /**
  * Further {@link XMindToLatexExporter} tests that do not concern configuration
  * or execution. 
@@ -64,8 +66,7 @@ public class XMindToLatexExporterTest {
         PrintStream out = new PrintStream(os);
         PrintStream old_out = System.out;
         System.setOut(out);
-        XMindToLatexExporter exporter = new XMindToLatexExporter();
-        exporter.showHelp();
+        CliParameters.showHelp();
         String resultContent = FileUtils.readFileToString(result);
         assertFalse(resultContent.isEmpty());
         System.setOut(old_out);
@@ -80,8 +81,7 @@ public class XMindToLatexExporterTest {
         };
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             
             Method getTextForLevel = exporter.getClass().getDeclaredMethod("getTextForLevel", int.class, String.class);
             assertNotNull(getTextForLevel);
@@ -113,8 +113,7 @@ public class XMindToLatexExporterTest {
 
         XMindToLatexExporter exporter;
         try {
-            exporter = new XMindToLatexExporter();
-            exporter.configure(args);
+            exporter = CliParameters.build(args);
             
             Method save = exporter.getClass().getDeclaredMethod("save", String.class);
             assertNotNull(save);
