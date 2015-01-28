@@ -52,7 +52,9 @@ public class Main {
     public static void main(String[] args) {
         try {
             XMindToLatexExporter tool = CliParameters.build(args);
-            tool.convert();
+            if (tool != null) {
+                tool.convert();                
+            }
         }
         catch (ParseException e) {
             System.err.println(e.getMessage());
