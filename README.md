@@ -10,6 +10,8 @@ The latest XMind to Latex release can be found [here](https://github.com/arnehab
 [![Coverage Status](https://coveralls.io/repos/arnehaber/xmind2latex/badge.png?branch=master)](https://coveralls.io/r/arnehaber/xmind2latex?branch=master)
 
 ## Version History
+### 1.3.0
+
 ### 1.2.0
 * Adds version parameter (issue [#11](https://github.com/arnehaber/xmind2latex/issues/11)).
 * UTF-8 output encoding (issue [#10](https://github.com/arnehaber/xmind2latex/issues/10)).
