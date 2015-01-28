@@ -110,6 +110,8 @@ public class CliParameters {
      * 
      * @param args Arguments to configure this {@link XMindToLatexExporter}.
      * 
+     * @return A created {@link XMindToLatexExporter} or null, if no {@link CliParameters#INPUT} parameter is used.
+     * 
      * @throws ParseException, NumberFormatException for invalid arguments
      * @throws ConfigurationException for invalid input files
      * @throws IllegalArgumentException if the given input file does not exist
@@ -125,88 +127,91 @@ public class CliParameters {
         
         if (cmd.hasOption(VERSION)) {
             printVersion();
-            throw new ParseException("");
         }
         
         CliParameters.validateNumberOfArguments(cmd, INPUT, options);
-        File in = new File(cmd.getOptionValue(INPUT));
-        Builder builder = new Builder(in);
-        
-        if (cmd.hasOption(FORCE)) {
-            CliParameters.validateNumberOfArguments(cmd, FORCE, options);
-            builder.overwritesExistingFiles(true);
-        }
-        
-        File out;
-        if (cmd.hasOption(OUTPUT)) {
-            CliParameters.validateNumberOfArguments(cmd, OUTPUT, options);
-            out = new File(cmd.getOptionValue(OUTPUT));
-            builder.withTargetFile(out);
-        }
-        
-        if (cmd.hasOption(TEMPLATE_LEVEL)) {
-            CliParameters.validateNumberOfArguments(cmd, TEMPLATE_LEVEL, options);
-            
-            String level = cmd.getOptionValue(TEMPLATE_LEVEL);
-            try {
-                int levelAsInt = Integer.parseInt(level);
-                if (levelAsInt < 0) {
-                    throw new NumberFormatException();
-                }
-                builder.withMaxLevel(levelAsInt);
-            }
-            catch (NumberFormatException e) {
-                ParseException ex = new ParseException("The level argument of option " + TEMPLATE_LEVEL + " has to be a positive integer.");
-                ex.addSuppressed(e);
-                throw ex;
+        if (cmd.hasOption(INPUT)) {
+            File in = new File(cmd.getOptionValue(INPUT));
+            Builder builder = new Builder(in);            
+            if (cmd.hasOption(FORCE)) {
+                CliParameters.validateNumberOfArguments(cmd, FORCE, options);
+                builder.overwritesExistingFiles(true);
             }
             
-        }
-        if (cmd.hasOption(HELP)) {
-            CliParameters.validateNumberOfArguments(cmd, HELP, options);
-          
-            showHelp();
-        }
-        
-        if (cmd.hasOption(ENVIRONMENT)) {
-            CliParameters.validateNumberOfArguments(cmd, ENVIRONMENT, options);
-            
-            String[] env = cmd.getOptionValues(ENVIRONMENT);
-            for (int i = 0; i + 2 < env.length; i = i + 3) {
-                String level = env[i];
-                String start = env[i + 1];
-                String end = env[i + 2];
-                try {
-                    int levelAsInt = Integer.parseInt(level);      
-                    builder.withEnvironmentTemplates(levelAsInt, start, end);
-                }
-                catch (NumberFormatException e) {
-                    ParseException ex = new ParseException("The level argument of option " + ENVIRONMENT + " has to be an integer.");
-                    ex.addSuppressed(e);
-                    throw ex;
-                }
+            File out;
+            if (cmd.hasOption(OUTPUT)) {
+                CliParameters.validateNumberOfArguments(cmd, OUTPUT, options);
+                out = new File(cmd.getOptionValue(OUTPUT));
+                builder.withTargetFile(out);
             }
-        }
-        if (cmd.hasOption(LEVEL)) {
-            CliParameters.validateNumberOfArguments(cmd, LEVEL, options);
             
-            String[] tmp = cmd.getOptionValues(LEVEL);
-
-            for (int i = 0; i + 1 < tmp.length; i = i + 2) {
-                String level = tmp[i];
-                String template = tmp[i + 1];
+            if (cmd.hasOption(TEMPLATE_LEVEL)) {
+                CliParameters.validateNumberOfArguments(cmd, TEMPLATE_LEVEL, options);
+                
+                String level = cmd.getOptionValue(TEMPLATE_LEVEL);
                 try {
                     int levelAsInt = Integer.parseInt(level);
-                    builder.withTemplate(levelAsInt, template);
+                    if (levelAsInt < 0) {
+                        throw new NumberFormatException();
+                    }
+                    builder.withMaxLevel(levelAsInt);
                 }
                 catch (NumberFormatException e) {
-                    ParseException ex = new ParseException("The level argument of option " + LEVEL + " has to be an integer.");
+                    ParseException ex = new ParseException("The level argument of option " + TEMPLATE_LEVEL + " has to be a positive integer.");
                     ex.addSuppressed(e);
                     throw ex;
                 }
+                
             }
+            if (cmd.hasOption(HELP)) {
+                CliParameters.validateNumberOfArguments(cmd, HELP, options);
+                
+                showHelp();
+            }
+            
+            if (cmd.hasOption(ENVIRONMENT)) {
+                CliParameters.validateNumberOfArguments(cmd, ENVIRONMENT, options);
+                
+                String[] env = cmd.getOptionValues(ENVIRONMENT);
+                for (int i = 0; i + 2 < env.length; i = i + 3) {
+                    String level = env[i];
+                    String start = env[i + 1];
+                    String end = env[i + 2];
+                    try {
+                        int levelAsInt = Integer.parseInt(level);      
+                        builder.withEnvironmentTemplates(levelAsInt, start, end);
+                    }
+                    catch (NumberFormatException e) {
+                        ParseException ex = new ParseException("The level argument of option " + ENVIRONMENT + " has to be an integer.");
+                        ex.addSuppressed(e);
+                        throw ex;
+                    }
+                }
+            }
+            if (cmd.hasOption(LEVEL)) {
+                CliParameters.validateNumberOfArguments(cmd, LEVEL, options);
+                
+                String[] tmp = cmd.getOptionValues(LEVEL);
+                
+                for (int i = 0; i + 1 < tmp.length; i = i + 2) {
+                    String level = tmp[i];
+                    String template = tmp[i + 1];
+                    try {
+                        int levelAsInt = Integer.parseInt(level);
+                        builder.withTemplate(levelAsInt, template);
+                    }
+                    catch (NumberFormatException e) {
+                        ParseException ex = new ParseException("The level argument of option " + LEVEL + " has to be an integer.");
+                        ex.addSuppressed(e);
+                        throw ex;
+                    }
+                }
+            }
+            return builder.build();
         }
-        return builder.build();
+        else {
+            return null;
+        }
     }
     
     private static void printVersion() {
