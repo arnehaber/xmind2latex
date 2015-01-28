@@ -45,6 +45,8 @@
     <assemble.dir>${project.build.directory}/app</assemble.dir>
     <licence.dir>${assemble.dir}/license</licence.dir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <app.version>${project.version}</app.version>
+    <app.name>${project.artifactId}</app.name>
   </properties>
 
   <dependencies>
@@ -232,6 +234,24 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <version>1.0-alpha-2</version>
+        <executions>
+          <execution>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>write-project-properties</goal>
+            </goals>
+            <configuration>
+              <outputFile>
+                ${project.build.outputDirectory}/xmind2latex-app.properties
+              </outputFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
@@ -319,6 +339,19 @@
                     <goals>
                       <goal>add-third-party</goal>
                       <goal>update-project-license</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore></ignore>
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <versionRange>[1.0-alpha-2,)</versionRange>
+                    <goals>
+                      <goal>write-project-properties</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>

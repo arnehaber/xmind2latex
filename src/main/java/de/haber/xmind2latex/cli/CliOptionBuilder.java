@@ -26,6 +26,7 @@ import static de.haber.xmind2latex.cli.CliParameters.INPUT;
 import static de.haber.xmind2latex.cli.CliParameters.LEVEL;
 import static de.haber.xmind2latex.cli.CliParameters.OUTPUT;
 import static de.haber.xmind2latex.cli.CliParameters.TEMPLATE_LEVEL;
+import static de.haber.xmind2latex.cli.CliParameters.VERSION;
 
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
@@ -65,7 +66,7 @@ class CliOptionBuilder {
                                 .withLongOpt("input")
                                 .withDescription("Required input file name.")
                                 .hasArg(true)
-                                .isRequired()
+                                .isRequired(false)
                                 .withType(PatternOptionBuilder.FILE_VALUE)
                                 .create(INPUT));
         o.addOption(OptionBuilder.withArgName("force")
@@ -111,6 +112,12 @@ class CliOptionBuilder {
                                  .hasArgs(2)
                                  .isRequired(false)
                                  .create(LEVEL));
+        o.addOption(OptionBuilder.withArgName("version")
+                                 .withLongOpt("version")
+                                 .withDescription("Prints the version.")
+                                 .hasArg(false)
+                                 .isRequired(false)
+                                 .create(VERSION));
         return o;
     }
 }

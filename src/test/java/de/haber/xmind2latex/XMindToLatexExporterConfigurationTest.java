@@ -23,15 +23,19 @@ import static de.haber.xmind2latex.XMindToLatexExporter.TEMPLATE_PACKAGE;
 import static de.haber.xmind2latex.cli.CliParameters.INPUT;
 import static de.haber.xmind2latex.cli.CliParameters.LEVEL;
 import static de.haber.xmind2latex.cli.CliParameters.TEMPLATE_LEVEL;
+import static de.haber.xmind2latex.cli.CliParameters.VERSION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 
 import net.lingala.zip4j.io.ZipInputStream;
@@ -566,6 +570,36 @@ public class XMindToLatexExporterConfigurationTest {
         catch (Exception e) {
             // this is expected
             assertTrue(e instanceof ParseException);
+        }
+    }
+    
+    @Test
+    public void testVersion() {
+        String[] args = new String[] {"-" + VERSION};
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        
+        PrintStream out = new PrintStream(result);
+        PrintStream old_out = System.out;
+        System.setOut(out);
+        try {
+            CliParameters.build(args);
+            fail("ParseException expected.");
+        }
+        catch (Exception e) {
+            // this is expected
+            assertTrue(e instanceof ParseException);
+            String resultContent = new String(result.toByteArray());
+            assertFalse(resultContent.isEmpty());
+            assertTrue(resultContent.contains("version"));
+            System.setOut(old_out);
+        }
+        finally {
+            try {
+                result.close();
+            }
+            catch (IOException e) {
+                fail(e.getMessage());
+            }
         }
     }
     
