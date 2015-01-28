@@ -27,6 +27,7 @@ import static de.haber.xmind2latex.cli.CliParameters.VERSION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -35,7 +36,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 
 import net.lingala.zip4j.io.ZipInputStream;
@@ -582,18 +582,19 @@ public class XMindToLatexExporterConfigurationTest {
         PrintStream old_out = System.out;
         System.setOut(out);
         try {
-            CliParameters.build(args);
-            fail("ParseException expected.");
-        }
-        catch (Exception e) {
-            // this is expected
-            assertTrue(e instanceof ParseException);
+            XMindToLatexExporter exp = CliParameters.build(args);
+            assertNull(exp);
             String resultContent = new String(result.toByteArray());
             assertFalse(resultContent.isEmpty());
             assertTrue(resultContent.contains("version"));
-            System.setOut(old_out);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            fail("ParseException expected.");
+            // this is expected
         }
         finally {
+            System.setOut(old_out);
             try {
                 result.close();
             }
