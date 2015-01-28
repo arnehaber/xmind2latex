@@ -20,6 +20,7 @@
 package de.haber.xmind2latex.cli;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.cli.BasicParser;
@@ -30,6 +31,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 
 import de.haber.xmind2latex.XMindToLatexExporter;
@@ -70,6 +72,8 @@ public class CliParameters {
     public static final char OUTPUT = 'o';
     
     public static final char TEMPLATE_LEVEL = 't';
+    
+    public static final char VERSION = 'v';
     
     private static final Options options = CliOptionBuilder.getOptions();
     
@@ -113,6 +117,16 @@ public class CliParameters {
     public static XMindToLatexExporter build(String[] args) throws ParseException {
         CommandLineParser parser = new BasicParser();
         CommandLine cmd = parser.parse(options, args, false);
+        
+        
+        if (cmd.getOptions().length == 0) {
+            throw new ParseException("Parameter -" + INPUT + " expected.");
+        }
+        
+        if (cmd.hasOption(VERSION)) {
+            printVersion();
+            throw new ParseException("");
+        }
         
         CliParameters.validateNumberOfArguments(cmd, INPUT, options);
         File in = new File(cmd.getOptionValue(INPUT));
@@ -195,6 +209,13 @@ public class CliParameters {
         return builder.build();
     }
     
+    private static void printVersion() {
+        List<Optional<String>> props = PropertyLoader.getProperties("xmind2latex-app.properties", "app.version", "app.name");
+        String name = props.get(1).or("xmind2latex");
+        String version = props.get(0).or("unknown");
+        System.out.println(name + " version \"" + version + "\"");
+    }
+
     /**
      * 
      */
